@@ -1,0 +1,19 @@
+name: Containers
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  libpostform_build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v2
+      with:
+        submodules: 'true'
+    - name: unit tests
+      run: make -j run_tests
