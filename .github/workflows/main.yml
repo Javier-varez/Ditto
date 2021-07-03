@@ -7,13 +7,17 @@ on:
     branches: [ main ]
 
 jobs:
-  libpostform_build:
+  tests:
     runs-on: ubuntu-latest
 
     steps:
     - name: checkout
       uses: actions/checkout@v2
+    - name: Run unit tests
+      uses: HorstBaerbel/action-ctest@1.1
+      # These are optional (defaults displayed)
       with:
-        submodules: 'true'
-    - name: unit tests
-      run: make -j run_tests
+        sourcedir: '.'
+        builddir: 'build'
+        cmakeoptions: ''
+        ctestoptions: ''
