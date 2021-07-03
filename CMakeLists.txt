@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 project(containers)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_EXPORT_COMPILE_COMMANDS true)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -15,6 +16,7 @@ enable_testing()
 add_executable(
   containers_test
   test/linked_list.cpp
+  test/pair.cpp
 )
 target_link_libraries(
   containers_test
