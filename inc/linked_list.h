@@ -80,7 +80,7 @@ class LinkedList {
   }
 
   template <class U>
-  auto find(U action) -> Node* {
+  auto find(U action) const -> Node* {
     Node* ptr = m_head.get();
     while (ptr) {
       if (action(ptr->get_element())) {
