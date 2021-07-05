@@ -11,7 +11,10 @@ class HashMap {
  public:
   HashMap() = default;
   explicit HashMap(std::size_t capacity)
-      : m_capacity(capacity), m_elements(capacity){};
+      : m_capacity(capacity),
+        m_elements(new LinkedList<Pair<K, V>>[capacity]){};
+
+  ~HashMap() { delete[] m_elements; }
 
   auto operator[](const K& key) -> V& {
     auto& node = search_or_reserve_slot(m_elements[hash_key(key)], key);
@@ -37,7 +40,8 @@ class HashMap {
  private:
   constexpr static std::size_t DEFAULT_CAPACITY = 1024;
   std::size_t m_capacity = DEFAULT_CAPACITY;
-  std::vector<LinkedList<Pair<K, V>>> m_elements{m_capacity};
+  LinkedList<Pair<K, V>>* m_elements{
+      new LinkedList<Pair<K, V>>[DEFAULT_CAPACITY]};
 
   auto search_slot(const LinkedList<Pair<K, V>>& list, const K& key) const ->
       typename LinkedList<Pair<K, V>>::Node* {

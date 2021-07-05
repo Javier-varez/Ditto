@@ -22,6 +22,11 @@ TEST_F(HashMapTest, TinyMap) {
   EXPECT_EQ(tiny_map[0], 123);
   EXPECT_EQ(tiny_map[1234567890], 234);
   EXPECT_EQ(tiny_map[1234567891], 345);
+
+  // The first two elements should collide.
+  EXPECT_EQ(hash(tiny_map, 0), 1);
+  EXPECT_EQ(hash(tiny_map, 1234567890), 1);
+  EXPECT_EQ(hash(tiny_map, 1234567891), 0);
 }
 
 TEST_F(HashMapTest, LargeMap) {
