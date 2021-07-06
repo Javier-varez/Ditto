@@ -18,6 +18,7 @@ add_executable(
   test/linked_list.cpp
   test/pair.cpp
   test/hash_map.cpp
+  test/linear_map.cpp
 )
 target_link_libraries(
   containers_test
