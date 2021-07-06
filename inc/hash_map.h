@@ -22,7 +22,7 @@ class HashMap {
   }
 
   auto at(const K& key) const -> const V* {
-    auto node = search_slot(m_elements[hash_key(key)], key);
+    auto* node = search_slot(m_elements[hash_key(key)], key);
     if (node == nullptr) {
       return nullptr;
     }
@@ -30,11 +30,18 @@ class HashMap {
   }
 
   auto at(const K& key) -> V* {
-    auto node = search_slot(m_elements[hash_key(key)], key);
+    auto* node = search_slot(m_elements[hash_key(key)], key);
     if (node == nullptr) {
       return nullptr;
     }
     return &node->get_element().right();
+  }
+
+  auto erase(const K& key) {
+    auto* node = search_slot(m_elements[hash_key(key)], key);
+    if (node != nullptr) {
+      m_elements[hash_key(key)].remove(node);
+    }
   }
 
  private:

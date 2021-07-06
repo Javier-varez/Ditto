@@ -29,6 +29,13 @@ class LinearMap {
     return bucket->value();
   }
 
+  auto erase(const K& key) -> V* {
+    auto* bucket = search_slot(key);
+    if (bucket != nullptr) {
+      bucket->used = false;
+    }
+  }
+
  private:
   struct Bucket {
     K key;

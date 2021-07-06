@@ -45,3 +45,15 @@ TEST(LinearMapTest, AtDoesNotInsertElement) {
   const LinearMap<int, int, 16>& const_map = large_map;
   EXPECT_NE(const_map.at(1234567892), nullptr);
 }
+
+TEST(LinearMapTest, EraseElement) {
+  LinearMap<int, int, 16> large_map{};
+
+  large_map[0] = 123;
+  large_map[1234567890] = 234;
+  large_map[1234567891] = 345;
+
+  EXPECT_NE(large_map.at(0), nullptr);
+  large_map.erase(0);
+  EXPECT_EQ(large_map.at(0), nullptr);
+}
