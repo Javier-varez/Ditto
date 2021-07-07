@@ -11,7 +11,11 @@ class LinkedList {
     std::unique_ptr<Node> m_next;
 
    public:
-    explicit Node(T element) : m_element(element) {}
+    explicit Node(T element) : m_element(std::move(element)) {}
+
+    template <class... Args>
+    Node(Args&&... args) : m_element(std::forward<Args>(args)...) {}
+
     Node(T element, std::unique_ptr<Node> next)
         : m_element(element), m_next(std::move(next)) {}
 
@@ -30,7 +34,7 @@ class LinkedList {
 
   LinkedList() = default;
 
-  void push_back(T&& element) {
+  void push_back(T element) {
     std::unique_ptr<Node>* element_ptr = &m_head;
     while (*element_ptr != nullptr) {
       element_ptr = &(*element_ptr)->m_next;
@@ -40,6 +44,22 @@ class LinkedList {
 
   void push_front(T element) {
     m_head = std::make_unique<Node>(element, std::move(m_head));
+  }
+
+  template <class... Args>
+  void emplace_back(Args&&... args) {
+    std::unique_ptr<Node>* element_ptr = &m_head;
+    while (*element_ptr != nullptr) {
+      element_ptr = &(*element_ptr)->m_next;
+    }
+    *element_ptr = std::make_unique<Node>(std::forward<Args>(args)...);
+  }
+
+  template <class... Args>
+  void emplace_front(Args&&... args) {
+    auto new_head = std::make_unique<Node>(std::forward<Args>(args)...);
+    new_head->m_next = std::move(m_head);
+    m_head = std::move(new_head);
   }
 
   void remove(Node* node) {

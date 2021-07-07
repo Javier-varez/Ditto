@@ -116,3 +116,9 @@ TEST(LinkedList, InsertAfter) {
         iter++;
       });
 }
+
+TEST(LinkedList, Emplace) {
+  LinkedList<std::string> list;
+  list.emplace_back("something");
+  list.emplace_front("something else");
+}
