@@ -25,8 +25,15 @@ class LinkedList {
 
     auto get_element() const -> const T& { return m_element; }
 
-    auto insert_after(T new_element) {
+    auto insert_after(const T& new_element) {
       m_next = std::make_unique<Node>(new_element, std::move(m_next));
+    }
+
+    template <class... Args>
+    auto emplace_after(Args&&... args) {
+      auto next = std::make_unique<Node>(std::forward<Args>(args)...);
+      next->m_next = std::move(m_next);
+      m_next = std::move(next);
     }
 
     friend LinkedList;

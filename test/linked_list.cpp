@@ -122,3 +122,22 @@ TEST(LinkedList, Emplace) {
   list.emplace_back("something");
   list.emplace_front("something else");
 }
+
+TEST(LinkedList, EmplaceArgs) {
+  LinkedList<std::string> list;
+  list.emplace_back("something");
+  list.emplace_front("something else");
+  LinkedList<std::string>::Node* head = list.head();
+  head->emplace_after("Oh boy");
+
+  list.walk([iter = 0U, expected = std::array<std::string, 3>{
+                            "something else", "Oh boy",
+                            "something"}](const std::string& element) mutable {
+    if (iter < expected.size()) {
+      EXPECT_EQ(expected[iter], element);
+    } else {
+      FAIL();
+    }
+    iter++;
+  });
+}
