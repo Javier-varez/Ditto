@@ -20,15 +20,33 @@ add_executable(
   test/hash_map.cpp
   test/linear_map.cpp
 )
+
 target_link_libraries(
   containers_test
   gtest_main
   gmock
 )
+
 target_include_directories(
   containers_test
   PRIVATE
   inc
+)
+
+target_compile_options(
+  containers_test
+  PRIVATE
+  -fsanitize=address
+  -g3
+  -Os
+)
+
+target_link_options(
+  containers_test
+  PRIVATE
+  -fsanitize=address
+  -g3
+  -Os
 )
 
 include(GoogleTest)

@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <vector>
 
 #include "linked_list.h"
@@ -17,30 +18,33 @@ class HashMap {
   ~HashMap() { delete[] m_elements; }
 
   auto operator[](const K& key) -> V& {
-    auto& node = search_or_reserve_slot(m_elements[hash_key(key)], key);
-    return node.get_element().right();
+    auto node = search_or_reserve_slot(m_elements[hash_key(key)], key);
+    return node->right();
   }
 
   auto at(const K& key) const -> const V* {
-    auto* node = search_slot(m_elements[hash_key(key)], key);
-    if (node == nullptr) {
+    const auto& list = m_elements[hash_key(key)];
+    auto iter = search_slot(list, key);
+    if (iter == list.cend()) {
       return nullptr;
     }
-    return &node->get_element().right();
+    return &iter->right();
   }
 
   auto at(const K& key) -> V* {
-    auto* node = search_slot(m_elements[hash_key(key)], key);
-    if (node == nullptr) {
+    auto& list = m_elements[hash_key(key)];
+    auto iter = search_slot(list, key);
+    if (iter == list.cend()) {
       return nullptr;
     }
-    return &node->get_element().right();
+    return &iter->right();
   }
 
   auto erase(const K& key) {
-    auto* node = search_slot(m_elements[hash_key(key)], key);
-    if (node != nullptr) {
-      m_elements[hash_key(key)].remove(node);
+    auto& list = m_elements[hash_key(key)];
+    auto iter = search_slot(list, key);
+    if (iter != list.cend()) {
+      list.erase(iter);
     }
   }
 
@@ -51,20 +55,29 @@ class HashMap {
       new LinkedList<Pair<K, V>>[DEFAULT_CAPACITY]};
 
   auto search_slot(const LinkedList<Pair<K, V>>& list, const K& key) const ->
-      typename LinkedList<Pair<K, V>>::Node* {
-    auto element = list.find(
-        [&key](const Pair<K, V>& element) { return element.left() == key; });
-    return element;
+      typename LinkedList<Pair<K, V>>::const_iterator {
+    auto iter = std::find_if(
+        list.cbegin(), list.cend(),
+        [&key](const Pair<K, V>& pair) { return pair.left() == key; });
+    return iter;
+  }
+
+  auto search_slot(LinkedList<Pair<K, V>>& list, const K& key) ->
+      typename LinkedList<Pair<K, V>>::iterator {
+    auto iter = std::find_if(
+        list.begin(), list.end(),
+        [&key](const Pair<K, V>& pair) { return pair.left() == key; });
+    return iter;
   }
 
   auto search_or_reserve_slot(LinkedList<Pair<K, V>>& list, const K& key) ->
-      typename LinkedList<Pair<K, V>>::Node& {
+      typename LinkedList<Pair<K, V>>::iterator {
     auto element = search_slot(list, key);
-    if (element == nullptr) {
+    if (element == list.cend()) {
       list.push_back(Pair<K, V>(key, V{}));
-      element = list.tail();
+      element = list.back_iter();
     }
-    return *element;
+    return element;
   }
 
   // These are random hashing functions, I should invest some more time into
