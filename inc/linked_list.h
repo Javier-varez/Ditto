@@ -187,101 +187,29 @@ class LinkedList {
 
   // Inserts an element before the passed iterator and returns an iterator to it
   iterator insert(const_iterator iter, const T& value) {
-    Node* current = iter.m_current;
-    if (current) {
-      if (Node* prev = current->m_prev) {
-        auto new_node = std::make_unique<Node>(value);
-        new_node->m_next = std::move(prev->m_next);
-        new_node->m_prev = prev;
-        if (new_node->m_next) {
-          current->m_prev = new_node.get();
-        }
-        prev->m_next = std::move(new_node);
-        return iterator{prev->m_next.get()};
-      } else {
-        push_front(value);
-        return begin();
-      }
-    } else {
-      // We are at the beginning of the list already
-      push_back(value);
-      return iterator{m_tail};
-    }
+    return put_at(iter, std::make_unique<Node>(value));
   }
 
   // Inserts an element before the passed iterator and returns an iterator to it
   template <class... Args>
   iterator emplace(const_iterator iter, Args&&... args) {
-    Node* current = iter.m_current;
-    if (current) {
-      if (Node* prev = current->m_prev) {
-        auto new_node = std::make_unique<Node>(std::forward<Args>(args)...);
-        new_node->m_next = std::move(prev->m_next);
-        new_node->m_prev = prev;
-        if (new_node->m_next) {
-          current->m_prev = new_node.get();
-        }
-        prev->m_next = std::move(new_node);
-        return iterator{prev->m_next.get()};
-      } else {
-        emplace_front(std::forward<Args>(args)...);
-        return begin();
-      }
-    } else {
-      // We are at the beginning of the list already
-      emplace_back(std::forward<Args>(args)...);
-      return iterator{m_tail};
-    }
+    return put_at(iter, std::make_unique<Node>(std::forward<Args>(args)...));
   }
 
   void push_back(T element) {
-    auto node = std::make_unique<Node>(std::move(element));
-    node->m_prev = m_tail;
-    if (m_tail) {
-      m_tail->m_next = std::move(node);
-      m_tail = m_tail->m_next.get();
-    } else {
-      m_head = std::move(node);
-      m_tail = m_head.get();
-    }
+    put_back(std::make_unique<Node>(std::move(element)));
   }
 
-  void push_front(T element) {
-    auto new_head = std::make_unique<Node>(element);
-    new_head->m_next = std::move(m_head);
-    if (new_head->m_next) {
-      new_head->m_next->m_prev = new_head.get();
-    }
-    m_head = std::move(new_head);
-    if (m_tail == nullptr) {
-      m_tail = m_head.get();
-    }
-  }
+  void push_front(T element) { put_front(std::make_unique<Node>(element)); }
 
   template <class... Args>
   void emplace_back(Args&&... args) {
-    auto node = std::make_unique<Node>(std::forward<Args>(args)...);
-    node->m_prev = m_tail;
-    if (m_tail) {
-      m_tail->m_next = std::move(node);
-      m_tail = m_tail->m_next.get();
-    } else {
-      m_head = std::move(node);
-      m_tail = m_head.get();
-    }
+    put_back(std::make_unique<Node>(std::forward<Args>(args)...));
   }
 
   template <class... Args>
   void emplace_front(Args&&... args) {
-    auto new_head = std::make_unique<Node>(std::forward<Args>(args)...);
-    new_head->m_next = std::move(m_head);
-    if (new_head->m_next) {
-      new_head->m_next->m_prev = new_head.get();
-    }
-    m_head = std::move(new_head);
-    if (m_tail == nullptr) {
-      m_tail = m_head.get();
-    }
+    put_front(std::make_unique<Node>(std::forward<Args>(args)...));
   }
 
   void pop_back() {
@@ -331,4 +259,48 @@ class LinkedList {
  private:
   std::unique_ptr<Node> m_head = nullptr;
   Node* m_tail = nullptr;
+
+  void put_front(std::unique_ptr<Node> new_head) {
+    new_head->m_next = std::move(m_head);
+    if (new_head->m_next) {
+      new_head->m_next->m_prev = new_head.get();
+    }
+    m_head = std::move(new_head);
+    if (m_tail == nullptr) {
+      m_tail = m_head.get();
+    }
+  }
+
+  void put_back(std::unique_ptr<Node> node) {
+    node->m_prev = m_tail;
+    if (m_tail) {
+      m_tail->m_next = std::move(node);
+      m_tail = m_tail->m_next.get();
+    } else {
+      m_head = std::move(node);
+      m_tail = m_head.get();
+    }
+  }
+
+  iterator put_at(const_iterator iter, std::unique_ptr<Node> new_node) {
+    Node* current = iter.m_current;
+    if (current) {
+      if (Node* prev = current->m_prev) {
+        new_node->m_next = std::move(prev->m_next);
+        new_node->m_prev = prev;
+        if (new_node->m_next) {
+          current->m_prev = new_node.get();
+        }
+        prev->m_next = std::move(new_node);
+        return iterator{prev->m_next.get()};
+      } else {
+        put_front(std::move(new_node));
+        return begin();
+      }
+    } else {
+      // We are at the beginning of the list already
+      put_back(std::move(new_node));
+      return iterator{m_tail};
+    }
+  }
 };
