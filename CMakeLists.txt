@@ -19,6 +19,7 @@ add_executable(
   test/pair.cpp
   test/hash_map.cpp
   test/linear_map.cpp
+  test/box.cpp
 )
 
 target_link_libraries(
