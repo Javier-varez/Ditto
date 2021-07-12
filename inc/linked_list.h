@@ -2,8 +2,11 @@
 #pragma once
 
 #include <cstddef>
-#include <memory>
+#include <cstdint>
+#include <iterator>
 #include <type_traits>
+
+#include "box.h"
 
 template <class T>
 class LinkedList;
@@ -11,7 +14,7 @@ class LinkedList;
 template <class T>
 struct LinkedListNode {
   T m_element;
-  std::unique_ptr<LinkedListNode> m_next = nullptr;
+  Box<LinkedListNode> m_next;
   LinkedListNode* m_prev = nullptr;
 
  public:
@@ -181,45 +184,43 @@ class LinkedList {
   }
 
   auto clear() {
-    m_head = nullptr;
+    m_head.reset();
     m_tail = nullptr;
   }
 
   // Inserts an element before the passed iterator and returns an iterator to it
   iterator insert(const_iterator iter, const T& value) {
-    return put_at(iter, std::make_unique<Node>(value));
+    return put_at(iter, make_box<Node>(value));
   }
 
   // Inserts an element before the passed iterator and returns an iterator to it
   template <class... Args>
   iterator emplace(const_iterator iter, Args&&... args) {
-    return put_at(iter, std::make_unique<Node>(std::forward<Args>(args)...));
+    return put_at(iter, make_box<Node>(std::forward<Args>(args)...));
   }
 
-  void push_back(T element) {
-    put_back(std::make_unique<Node>(std::move(element)));
-  }
+  void push_back(T element) { put_back(make_box<Node>(std::move(element))); }
 
-  void push_front(T element) { put_front(std::make_unique<Node>(element)); }
+  void push_front(T element) { put_front(make_box<Node>(element)); }
 
   template <class... Args>
   void emplace_back(Args&&... args) {
-    put_back(std::make_unique<Node>(std::forward<Args>(args)...));
+    put_back(make_box<Node>(std::forward<Args>(args)...));
   }
 
   template <class... Args>
   void emplace_front(Args&&... args) {
-    put_front(std::make_unique<Node>(std::forward<Args>(args)...));
+    put_front(make_box<Node>(std::forward<Args>(args)...));
   }
 
   void pop_back() {
     if (m_tail) {
       if (Node* new_tail = m_tail->m_prev) {
         m_tail = new_tail;
-        m_tail->m_next = nullptr;
+        m_tail->m_next.reset();
       } else {
         // There's only one element
-        m_head = nullptr;
+        m_head.reset();
         m_tail = nullptr;
       }
     }
@@ -227,7 +228,8 @@ class LinkedList {
 
   void pop_front() {
     if (m_head) {
-      m_head = std::move(m_head->m_next);
+      auto new_head = std::move(m_head->m_next);
+      m_head = std::move(new_head);
       if (m_head) {
         m_head->m_prev = nullptr;
       }
@@ -257,10 +259,10 @@ class LinkedList {
   }
 
  private:
-  std::unique_ptr<Node> m_head = nullptr;
+  Box<Node> m_head;
   Node* m_tail = nullptr;
 
-  void put_front(std::unique_ptr<Node> new_head) {
+  void put_front(Box<Node> new_head) {
     new_head->m_next = std::move(m_head);
     if (new_head->m_next) {
       new_head->m_next->m_prev = new_head.get();
@@ -271,7 +273,7 @@ class LinkedList {
     }
   }
 
-  void put_back(std::unique_ptr<Node> node) {
+  void put_back(Box<Node> node) {
     node->m_prev = m_tail;
     if (m_tail) {
       m_tail->m_next = std::move(node);
@@ -282,7 +284,7 @@ class LinkedList {
     }
   }
 
-  iterator put_at(const_iterator iter, std::unique_ptr<Node> new_node) {
+  iterator put_at(const_iterator iter, Box<Node> new_node) {
     Node* current = iter.m_current;
     if (current) {
       if (Node* prev = current->m_prev) {
