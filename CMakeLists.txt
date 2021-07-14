@@ -11,6 +11,12 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
+set(ATE_BUILD_OPTIONS
+  -fsanitize=address
+  -g3
+  -Os
+)
+
 enable_testing()
 
 add_executable(
@@ -35,19 +41,33 @@ target_include_directories(
 )
 
 target_compile_options(
+  gtest_main
+  PRIVATE
+  ${ATE_BUILD_OPTIONS}
+)
+
+target_compile_options(
+  gtest
+  PRIVATE
+  ${ATE_BUILD_OPTIONS}
+)
+
+target_compile_options(
+  gmock
+  PRIVATE
+  ${ATE_BUILD_OPTIONS}
+)
+
+target_compile_options(
   containers_test
   PRIVATE
-  -fsanitize=address
-  -g3
-  -Os
+  ${ATE_BUILD_OPTIONS}
 )
 
 target_link_options(
   containers_test
   PRIVATE
-  -fsanitize=address
-  -g3
-  -Os
+  ${ATE_BUILD_OPTIONS}
 )
 
 include(GoogleTest)
