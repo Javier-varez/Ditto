@@ -2,12 +2,12 @@
 #pragma once
 
 #include <algorithm>
-#include <vector>
 
+#include "hash.h"
 #include "linked_list.h"
 #include "pair.h"
 
-template <class K, class V>
+template <class K, class V, class HASH = Hash>
 class HashMap {
  public:
   HashMap() = default;
@@ -18,12 +18,13 @@ class HashMap {
   ~HashMap() { delete[] m_elements; }
 
   auto operator[](const K& key) -> V& {
-    auto node = search_or_reserve_slot(m_elements[hash_key(key)], key);
+    auto node = search_or_reserve_slot(
+        m_elements[HASH::calculate(key) % m_capacity], key);
     return node->right();
   }
 
   auto at(const K& key) const -> const V* {
-    const auto& list = m_elements[hash_key(key)];
+    const auto& list = m_elements[HASH::calculate(key) % m_capacity];
     auto iter = search_slot(list, key);
     if (iter == list.cend()) {
       return nullptr;
@@ -32,7 +33,7 @@ class HashMap {
   }
 
   auto at(const K& key) -> V* {
-    auto& list = m_elements[hash_key(key)];
+    auto& list = m_elements[HASH::calculate(key) % m_capacity];
     auto iter = search_slot(list, key);
     if (iter == list.cend()) {
       return nullptr;
@@ -41,7 +42,7 @@ class HashMap {
   }
 
   auto erase(const K& key) {
-    auto& list = m_elements[hash_key(key)];
+    auto& list = m_elements[HASH::calculate(key) % m_capacity];
     auto iter = search_slot(list, key);
     if (iter != list.cend()) {
       list.erase(iter);
@@ -78,23 +79,6 @@ class HashMap {
       element = list.back_iter();
     }
     return element;
-  }
-
-  // These are random hashing functions, I should invest some more time into
-  // improving them.
-  template <std::enable_if_t<std::is_integral<K>::value, bool> = false>
-  auto hash_key(const K& key) const -> std::size_t {
-    uint64_t hash = key;
-    hash ^= 0xDEADC0DE;
-    hash ^= key << 13;
-    hash += key >> 1;
-    hash += key << 22;
-    hash ^= key << 3;
-    hash ^= ~(key << 2);
-    hash += key << 8;
-    hash += key >> 20;
-    hash ^= key << 7;
-    return hash % m_capacity;
   }
 
   friend class HashMapTest;
