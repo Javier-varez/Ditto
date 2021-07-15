@@ -4,6 +4,8 @@
 #include <cstdint>
 #include <utility>
 
+namespace ATE {
+
 template <class K, class V, std::size_t CAPACITY>
 class LinearMap {
  public:
@@ -128,3 +130,5 @@ class LinearMap {
 
   friend class LinearMapTest;
 };
+
+}  // namespace ATE

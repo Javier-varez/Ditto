@@ -4,6 +4,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
+using ATE::LinkedList;
 using testing::ElementsAreArray;
 
 TEST(LinkedList, PushBack) {

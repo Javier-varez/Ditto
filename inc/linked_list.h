@@ -8,6 +8,8 @@
 
 #include "box.h"
 
+namespace ATE {
+
 template <class T>
 class LinkedList;
 
@@ -306,3 +308,5 @@ class LinkedList {
     }
   }
 };
+
+}  // namespace ATE

@@ -2,6 +2,8 @@
 #include <cstdint>
 #include <type_traits>
 
+namespace ATE {
+
 class Hash {
  public:
   // These are random hashing functions, I should invest some more time into
@@ -21,3 +23,5 @@ class Hash {
     return hash;
   }
 };
+
+}  // namespace ATE

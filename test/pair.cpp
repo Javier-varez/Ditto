@@ -6,6 +6,8 @@
 
 #include <string>
 
+using ATE::Pair;
+
 TEST(PairTest, Constructor) {
   Pair<int, std::string> pair{1, "cool!"};
 

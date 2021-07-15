@@ -3,6 +3,9 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
+using ATE::Hash;
+using ATE::HashMap;
+
 TEST(HashMapTest, TinyMap) {
   HashMap<int, int> tiny_map{2};
 

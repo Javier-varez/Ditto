@@ -4,6 +4,8 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
+using ATE::Box;
+using ATE::make_box;
 using testing::ElementsAreArray;
 
 TEST(BoxTest, DefaultConstructor) {

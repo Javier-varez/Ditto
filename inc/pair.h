@@ -1,6 +1,7 @@
 
 #pragma once
 
+namespace ATE {
 template <class L, class R>
 class Pair {
  public:
@@ -18,3 +19,5 @@ class Pair {
   L m_left;
   R m_right;
 };
+
+}  // namespace ATE

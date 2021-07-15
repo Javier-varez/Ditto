@@ -5,6 +5,8 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
+using ATE::LinearMap;
+
 TEST(LinearMapTest, TinyMap) {
   LinearMap<int, int, 4> tiny_map;
 

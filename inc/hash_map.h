@@ -7,7 +7,9 @@
 #include "linked_list.h"
 #include "pair.h"
 
-template <class K, class V, class HASH = Hash>
+namespace ATE {
+
+template <class K, class V, class HASH = ATE::Hash>
 class HashMap {
  public:
   HashMap() = default;
@@ -83,3 +85,5 @@ class HashMap {
 
   friend class HashMapTest;
 };
+
+}  // namespace ATE
