@@ -17,11 +17,12 @@ jobs:
     steps:
     - name: checkout
       uses: actions/checkout@v2
-    - name: Run unit tests
-      uses: HorstBaerbel/action-ctest@1.1
-      # These are optional (defaults displayed)
+    - name: Build with CMake
+      uses: lukka/run-cmake@v3
       with:
-        sourcedir: '.'
-        builddir: 'build'
-        cmakeoptions: ''
-        ctestoptions: ''
+        cmakeListsOrSettingsJson: 'CMakeListsTxtAdvanced'
+        cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
+        cmakeAppendedArgs: ''
+        buildDirectory: '${{ github.workspace }}/build'
+    - name: Execute tests
+      run: '${{ github.workspace }}/build/containers_test'
