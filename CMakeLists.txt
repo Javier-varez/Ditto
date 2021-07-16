@@ -1,8 +1,16 @@
 cmake_minimum_required(VERSION 3.14)
 project(containers)
 
-set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS true)
+
+add_library(ate_containers INTERFACE)
+target_include_directories(ate_containers INTERFACE inc)
+
+set_property(TARGET ate_containers PROPERTY CXX_STANDARD 17)
+
+option(BUILD_CONTAINER_TESTS "Builds the containers tests" OFF)
+
+if(BUILD_CONTAINER_TESTS)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -30,15 +38,12 @@ add_executable(
 
 target_link_libraries(
   containers_test
+  ate_containers
   gtest_main
   gmock
 )
 
-target_include_directories(
-  containers_test
-  PRIVATE
-  inc
-)
+set_property(TARGET containers_test PROPERTY CXX_STANDARD 17)
 
 target_compile_options(
   gtest_main
@@ -72,3 +77,5 @@ target_link_options(
 
 include(GoogleTest)
 gtest_discover_tests(containers_test)
+
+endif()

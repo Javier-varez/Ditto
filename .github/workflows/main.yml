@@ -22,7 +22,7 @@ jobs:
       with:
         cmakeListsOrSettingsJson: 'CMakeListsTxtAdvanced'
         cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
-        cmakeAppendedArgs: ''
+        cmakeAppendedArgs: '-D BUILD_CONTAINER_TESTS=ON'
         buildDirectory: '${{ github.workspace }}/build'
     - name: Execute tests
       run: '${{ github.workspace }}/build/containers_test'
