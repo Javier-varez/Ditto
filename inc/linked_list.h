@@ -177,17 +177,12 @@ class LinkedList {
   auto back_iter() const -> const_iterator { return const_iterator{m_tail}; }
 
   [[nodiscard]] auto empty() const -> bool { return m_head == nullptr; }
-  [[nodiscard]] auto size() const -> size_type {
-    size_type count = 0;
-    for (const auto& val : *this) {
-      count++;
-    }
-    return count;
-  }
+  [[nodiscard]] auto size() const -> size_type { return m_size; }
 
   auto clear() {
     m_head.reset();
     m_tail = nullptr;
+    m_size = 0;
   }
 
   // Inserts an element before the passed iterator and returns an iterator to it
@@ -225,6 +220,7 @@ class LinkedList {
         m_head.reset();
         m_tail = nullptr;
       }
+      m_size--;
     }
   }
 
@@ -235,6 +231,7 @@ class LinkedList {
       if (m_head) {
         m_head->m_prev = nullptr;
       }
+      m_size--;
     }
   }
 
@@ -257,12 +254,14 @@ class LinkedList {
     auto deleted_element = std::move(pos.m_current->m_prev->m_next);
     deleted_element->m_next->m_prev = deleted_element->m_prev;
     deleted_element->m_prev->m_next = std::move(deleted_element->m_next);
+    m_size--;
     return iterator{deleted_element->m_prev->m_next.get()};
   }
 
  private:
   Box<Node> m_head;
   Node* m_tail = nullptr;
+  size_type m_size = 0;
 
   void put_front(Box<Node> new_head) {
     new_head->m_next = std::move(m_head);
@@ -273,6 +272,7 @@ class LinkedList {
     if (m_tail == nullptr) {
       m_tail = m_head.get();
     }
+    m_size++;
   }
 
   void put_back(Box<Node> node) {
@@ -284,6 +284,7 @@ class LinkedList {
       m_head = std::move(node);
       m_tail = m_head.get();
     }
+    m_size++;
   }
 
   iterator put_at(const_iterator iter, Box<Node> new_node) {
@@ -296,6 +297,7 @@ class LinkedList {
           current->m_prev = new_node.get();
         }
         prev->m_next = std::move(new_node);
+        m_size++;
         return iterator{prev->m_next.get()};
       } else {
         put_front(std::move(new_node));
