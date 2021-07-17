@@ -3,9 +3,9 @@
 
 #include <algorithm>
 
-#include "hash.h"
-#include "linked_list.h"
-#include "pair.h"
+#include "ATE/hash.h"
+#include "ATE/linked_list.h"
+#include "ATE/pair.h"
 
 namespace ATE {
 

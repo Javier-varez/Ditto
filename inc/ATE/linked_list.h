@@ -6,7 +6,7 @@
 #include <iterator>
 #include <type_traits>
 
-#include "box.h"
+#include "ATE/box.h"
 
 namespace ATE {
 
