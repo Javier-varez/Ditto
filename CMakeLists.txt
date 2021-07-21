@@ -34,6 +34,7 @@ add_executable(
   test/hash_map.cpp
   test/linear_map.cpp
   test/box.cpp
+  test/polymorphic_object.cpp
 )
 
 target_link_libraries(
