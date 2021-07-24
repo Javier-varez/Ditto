@@ -3,10 +3,13 @@ project(containers)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS true)
 
-add_library(ate_containers INTERFACE)
+add_library(
+  ate_containers
+  INTERFACE
+)
 target_include_directories(ate_containers INTERFACE inc)
 
-set_property(TARGET ate_containers PROPERTY CXX_STANDARD 17)
+set_property(TARGET ate_containers PROPERTY CXX_STANDARD 20)
 
 option(BUILD_CONTAINER_TESTS "Builds the containers tests" OFF)
 
@@ -35,6 +38,7 @@ add_executable(
   test/linear_map.cpp
   test/box.cpp
   test/polymorphic_object.cpp
+  test/state_machine.cpp
 )
 
 target_link_libraries(
@@ -44,7 +48,7 @@ target_link_libraries(
   gmock
 )
 
-set_property(TARGET containers_test PROPERTY CXX_STANDARD 17)
+set_property(TARGET containers_test PROPERTY CXX_STANDARD 20)
 
 target_compile_options(
   gtest_main

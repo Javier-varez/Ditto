@@ -74,3 +74,13 @@ TEST(PolymorphicObjectTest, Make) {
   EXPECT_EQ(dynamic_cast<Derived1*>(obj.get()), nullptr);
   EXPECT_EQ(dynamic_cast<Derived2*>(obj.get()), nullptr);
 }
+
+TEST(PolymorphicObjectTest, Reset) {
+  PolymorphicObject<Base, Derived3> obj;
+
+  obj.make<Derived3>("");
+  EXPECT_NE(obj.get(), nullptr);
+
+  obj.reset();
+  EXPECT_EQ(obj.get(), nullptr);
+}
