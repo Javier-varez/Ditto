@@ -15,7 +15,7 @@ jobs:
         os: [ubuntu-latest, macos-latest]
 
     steps:
-    - name: checkout
+    - name: Checkout
       uses: actions/checkout@v2
     - name: Build with CMake
       uses: lukka/run-cmake@v3
@@ -24,5 +24,8 @@ jobs:
         cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
         cmakeAppendedArgs: '-D BUILD_CONTAINER_TESTS=ON'
         buildDirectory: '${{ github.workspace }}/build'
+      env:
+        CC: ${{ matrix.os == 'ubuntu-latest' && 'clang-12' || 'clang' }}
+        CXX: ${{ matrix.os == 'ubuntu-latest' && 'clang++-12' || 'clang++' }}
     - name: Execute tests
       run: '${{ github.workspace }}/build/containers_test'
