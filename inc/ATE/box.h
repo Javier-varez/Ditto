@@ -28,16 +28,13 @@ class Box {
 
   explicit operator bool() const noexcept { return m_contents != nullptr; }
 
-  auto operator->() noexcept -> T* { return m_contents; }
-  auto operator->() const noexcept -> const T* { return m_contents; }
+  [[nodiscard]] auto operator->() const noexcept -> T* { return m_contents; }
 
-  auto operator*() noexcept -> T& { return *m_contents; }
-  auto operator*() const noexcept -> const T& { return *m_contents; }
+  [[nodiscard]] auto operator*() const noexcept -> T& { return *m_contents; }
 
-  auto get() const noexcept -> T* { return m_contents; }
-  auto get() noexcept -> T* { return m_contents; }
+  [[nodiscard]] auto get() const noexcept -> T* { return m_contents; }
 
-  auto reset() {
+  auto reset() noexcept {
     if (m_contents != nullptr) {
       delete m_contents;
       m_contents = nullptr;
