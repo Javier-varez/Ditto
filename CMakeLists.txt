@@ -39,7 +39,7 @@ add_executable(
   test/box.cpp
   test/polymorphic_object.cpp
   test/state_machine.cpp
-  test/circular_buffer.cpp
+  test/circular_queue.cpp
 )
 
 target_link_libraries(
