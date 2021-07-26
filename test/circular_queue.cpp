@@ -1,9 +1,10 @@
 
-#include "ATE/circular_buffer.h"
+#include "ATE/circular_queue.h"
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+using ATE::CircularQueue;
 using testing::Mock;
 using testing::StrictMock;
 
@@ -67,9 +68,9 @@ class Element {
   int m_value{0};
 };
 
-TEST(CircularBufferTest, EmplaceElement) {
+TEST(CircularQueueTest, EmplaceElement) {
   StrictMock<Whiny> whiny;
-  CircularBuffer<Element, 10> buffer;
+  CircularQueue<Element, 10> buffer;
 
   EXPECT_CALL(whiny, constructor());
   EXPECT_TRUE(buffer.emplace(&whiny, 23));
@@ -80,9 +81,9 @@ TEST(CircularBufferTest, EmplaceElement) {
   EXPECT_CALL(whiny, destructor());
 }
 
-TEST(CircularBufferTest, PushElement) {
+TEST(CircularQueueTest, PushElement) {
   StrictMock<Whiny> whiny;
-  CircularBuffer<Element, 10> buffer;
+  CircularQueue<Element, 10> buffer;
 
   EXPECT_CALL(whiny, constructor());
   EXPECT_CALL(whiny, move_constructor());
@@ -94,9 +95,9 @@ TEST(CircularBufferTest, PushElement) {
   EXPECT_CALL(whiny, destructor());
 }
 
-TEST(CircularBufferTest, PopElement) {
+TEST(CircularQueueTest, PopElement) {
   StrictMock<Whiny> whiny;
-  CircularBuffer<Element, 10> buffer;
+  CircularQueue<Element, 10> buffer;
 
   EXPECT_CALL(whiny, constructor());
   EXPECT_TRUE(buffer.emplace(&whiny, 23));
@@ -114,9 +115,9 @@ TEST(CircularBufferTest, PopElement) {
   EXPECT_FALSE(buffer.pop().has_value());
 }
 
-TEST(CircularBufferTest, PopMultipleElements) {
+TEST(CircularQueueTest, PopMultipleElements) {
   StrictMock<Whiny> whiny;
-  CircularBuffer<Element, 10> buffer;
+  CircularQueue<Element, 10> buffer;
 
   EXPECT_CALL(whiny, constructor());
   EXPECT_TRUE(buffer.emplace(&whiny, 23));
@@ -139,9 +140,9 @@ TEST(CircularBufferTest, PopMultipleElements) {
   EXPECT_FALSE(buffer.pop().has_value());
 }
 
-TEST(CircularBufferTest, DoesntPushElementsWhenFull) {
+TEST(CircularQueueTest, DoesntPushElementsWhenFull) {
   StrictMock<Whiny> whiny;
-  CircularBuffer<Element, 2> buffer;
+  CircularQueue<Element, 2> buffer;
 
   EXPECT_TRUE(buffer.empty());
 
@@ -178,10 +179,10 @@ TEST(CircularBufferTest, DoesntPushElementsWhenFull) {
   EXPECT_FALSE(buffer.pop().has_value());
 }
 
-TEST(CircularBufferTest, DestructorDestroysElementsInTheBuffer) {
+TEST(CircularQueueTest, DestructorDestroysElementsInTheBuffer) {
   constexpr std::size_t SIZE = 20;
   StrictMock<Whiny> whiny;
-  CircularBuffer<Element, SIZE> buffer;
+  CircularQueue<Element, SIZE> buffer;
 
   for (std::size_t i = 0; i < SIZE - 2; i++) {
     EXPECT_CALL(whiny, constructor());
