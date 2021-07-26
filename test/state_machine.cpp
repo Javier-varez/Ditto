@@ -4,6 +4,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+using ATE::State;
+using ATE::StateMachine;
 using testing::InSequence;
 using testing::StrictMock;
 

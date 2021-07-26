@@ -5,6 +5,8 @@
 
 #include "ATE/polymorphic_object.h"
 
+namespace ATE {
+
 template <class StateId, class EventId>
 class State {
  public:
@@ -72,3 +74,5 @@ class StateMachine {
     return nullptr;
   }
 };
+
+}  // namespace ATE
