@@ -28,12 +28,17 @@ class Box {
 
   explicit operator bool() const noexcept { return m_contents != nullptr; }
 
-  [[nodiscard]] auto operator->() const noexcept -> T* { return m_contents; }
+  // Operators that access the internal pointer should not be called on a
+  // temporary, as the pointer is immediately released.
+  //
+  // Therefore, these operators and methods are declared as methods for lvalue
+  // references.
+  [[nodiscard]] auto operator->() const& noexcept -> T* { return m_contents; }
+  [[nodiscard]] auto operator*() const& noexcept -> T& { return *m_contents; }
+  [[nodiscard]] auto get() const& noexcept -> T* { return m_contents; }
 
-  [[nodiscard]] auto operator*() const noexcept -> T& { return *m_contents; }
-
-  [[nodiscard]] auto get() const noexcept -> T* { return m_contents; }
-
+  // Calling reset on a temporary does not make sense, it will be destroyed
+  // anyways.
   auto reset() noexcept {
     if (m_contents != nullptr) {
       delete m_contents;
