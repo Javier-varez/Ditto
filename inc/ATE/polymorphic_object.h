@@ -2,7 +2,6 @@
 #pragma once
 
 #include <algorithm>
-#include <cstdint>
 #include <cstring>
 #include <new>
 #include <type_traits>

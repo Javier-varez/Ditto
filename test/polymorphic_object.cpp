@@ -1,8 +1,12 @@
 
 #include "ATE/polymorphic_object.h"
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
+#include <gmock/gmock-matchers.h>
+#include <gtest/gtest-message.h>
+#include <gtest/gtest-test-part.h>
+#include <gtest/gtest_pred_impl.h>
+
+#include <memory>
 
 using ATE::PolymorphicObject;
 using testing::ElementsAreArray;

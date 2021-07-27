@@ -2,6 +2,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cstddef>
 
 #include "ATE/hash.h"
 #include "ATE/linked_list.h"

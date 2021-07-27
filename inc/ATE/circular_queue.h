@@ -3,8 +3,11 @@
 
 #include <array>
 #include <compare>
+#include <cstddef>
+#include <new>
 #include <optional>
 #include <type_traits>
+#include <utility>
 
 namespace ATE {
 /**
