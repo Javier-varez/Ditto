@@ -9,7 +9,7 @@ add_library(
 )
 target_include_directories(ate_containers INTERFACE inc)
 
-set_property(TARGET ate_containers PROPERTY CXX_STANDARD 20)
+target_compile_features(ate_containers INTERFACE cxx_std_20)
 
 option(BUILD_CONTAINER_TESTS "Builds the containers tests" OFF)
 
@@ -49,7 +49,7 @@ target_link_libraries(
   gmock
 )
 
-set_property(TARGET containers_test PROPERTY CXX_STANDARD 20)
+target_compile_features(containers_test INTERFACE cxx_std_20)
 
 target_compile_options(
   gtest_main

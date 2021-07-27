@@ -1,9 +1,10 @@
 #include "ATE/linear_map.h"
 
-#include <string>
+#include <gtest/gtest-message.h>
+#include <gtest/gtest-test-part.h>
+#include <gtest/gtest_pred_impl.h>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
+#include <string>
 
 using ATE::LinearMap;
 

@@ -1,8 +1,13 @@
 
 #include "ATE/linked_list.h"
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
+#include <gmock/gmock-matchers.h>
+#include <gtest/gtest-message.h>
+#include <gtest/gtest-test-part.h>
+#include <gtest/gtest_pred_impl.h>
+
+#include <array>
+#include <vector>
 
 using ATE::LinkedList;
 using testing::ElementsAreArray;

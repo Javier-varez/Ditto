@@ -1,7 +1,9 @@
 
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
+#include <new>
 #include <utility>
 
 namespace ATE {

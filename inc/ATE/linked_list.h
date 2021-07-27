@@ -2,16 +2,13 @@
 #pragma once
 
 #include <cstddef>
-#include <cstdint>
 #include <iterator>
 #include <type_traits>
+#include <utility>
 
 #include "ATE/box.h"
 
 namespace ATE {
-
-template <class T>
-class LinkedList;
 
 template <class T>
 struct LinkedListNode {
