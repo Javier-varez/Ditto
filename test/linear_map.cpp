@@ -39,16 +39,16 @@ TEST(LinearMapTest, AtDoesNotInsertElement) {
   large_map[1234567890] = 234;
   large_map[1234567891] = 345;
 
-  EXPECT_EQ(*large_map.at(0), 123);
-  EXPECT_EQ(*large_map.at(1234567890), 234);
-  EXPECT_EQ(*large_map.at(1234567891), 345);
-  EXPECT_EQ(large_map.at(1234567892), nullptr);
+  EXPECT_EQ(large_map.at(0).value_or(0), 123);
+  EXPECT_EQ(large_map.at(1234567890).value_or(0), 234);
+  EXPECT_EQ(large_map.at(1234567891).value_or(0), 345);
+  EXPECT_FALSE(large_map.at(1234567892).has_value());
   EXPECT_EQ(large_map[1234567892], 0);
-  EXPECT_NE(large_map.at(1234567892), nullptr);
-  EXPECT_EQ(*large_map.at(1234567892), 0);
+  EXPECT_TRUE(large_map.at(1234567892).has_value());
+  EXPECT_EQ(large_map.at(1234567892).value_or(0), 0);
 
   const LinearMap<int, int, 16>& const_map = large_map;
-  EXPECT_NE(const_map.at(1234567892), nullptr);
+  EXPECT_TRUE(const_map.at(1234567892).has_value());
 }
 
 TEST(LinearMapTest, EraseElement) {
@@ -58,9 +58,9 @@ TEST(LinearMapTest, EraseElement) {
   large_map[1234567890] = 234;
   large_map[1234567891] = 345;
 
-  EXPECT_NE(large_map.at(0), nullptr);
+  EXPECT_TRUE(large_map.at(0).has_value());
   large_map.erase(0);
-  EXPECT_EQ(large_map.at(0), nullptr);
+  EXPECT_FALSE(large_map.at(0).has_value());
 }
 
 class Thing {
@@ -83,9 +83,9 @@ TEST(LinearMapTest, NonDefaultConstructibleThing) {
   large_map[Thing{1234567890}] = Thing{234};
   large_map[Thing{1234567891}] = Thing{345};
 
-  EXPECT_EQ(*large_map.at(Thing{0}), Thing{123});
-  EXPECT_EQ(*large_map.at(Thing{1234567890}), Thing{234});
-  EXPECT_EQ(*large_map.at(Thing{1234567891}), Thing{345});
+  EXPECT_EQ(large_map.at(Thing{0}).value_or(Thing{0}), Thing{123});
+  EXPECT_EQ(large_map.at(Thing{1234567890}).value_or(Thing{0}), Thing{234});
+  EXPECT_EQ(large_map.at(Thing{1234567891}).value_or(Thing{0}), Thing{345});
 }
 
 TEST(LinearMapTest, Emplace) {
@@ -95,7 +95,7 @@ TEST(LinearMapTest, Emplace) {
   large_map.emplace("1", 234);
   large_map.emplace("1234", 345);
 
-  EXPECT_EQ(*large_map.at("0"), Thing{123});
-  EXPECT_EQ(*large_map.at("1"), Thing{234});
-  EXPECT_EQ(*large_map.at("1234"), Thing{345});
+  EXPECT_EQ(large_map.at("0").value_or(Thing{0}), Thing{123});
+  EXPECT_EQ(large_map.at("1").value_or(Thing{0}), Thing{234});
+  EXPECT_EQ(large_map.at("1234").value_or(Thing{0}), Thing{345});
 }
