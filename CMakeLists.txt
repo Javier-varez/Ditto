@@ -41,6 +41,7 @@ add_executable(
   test/polymorphic_object.cpp
   test/state_machine.cpp
   test/circular_queue.cpp
+  test/non_null_ptr.cpp
   test/assert.cpp
 )
 
