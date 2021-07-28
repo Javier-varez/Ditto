@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <new>
+#include <optional>
 #include <utility>
 
 namespace ATE {
@@ -18,20 +19,14 @@ class LinearMap {
     return bucket.value();
   }
 
-  auto at(const K& key) const -> const V* {
-    auto* bucket = search_slot(key);
-    if (bucket == nullptr) {
-      return nullptr;
-    }
-    return &bucket->value();
-  }
+  bool contains(const K& key) const { return search_slot(key) != nullptr; }
 
-  auto at(const K& key) -> V* {
+  auto at(const K& key) const -> std::optional<V> {
     auto* bucket = search_slot(key);
     if (bucket == nullptr) {
-      return nullptr;
+      return std::optional<V>{};
     }
-    return &bucket->value();
+    return std::optional{bucket->value()};
   }
 
   template <class... Args>
