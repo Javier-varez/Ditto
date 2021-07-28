@@ -5,11 +5,12 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS true)
 
 add_library(
   ate_containers
-  INTERFACE
+  STATIC
+  src/assert.cpp
 )
-target_include_directories(ate_containers INTERFACE inc)
+target_include_directories(ate_containers PUBLIC inc)
 
-target_compile_features(ate_containers INTERFACE cxx_std_20)
+target_compile_features(ate_containers PUBLIC cxx_std_20)
 
 option(BUILD_CONTAINER_TESTS "Builds the containers tests" OFF)
 
@@ -40,7 +41,10 @@ add_executable(
   test/polymorphic_object.cpp
   test/state_machine.cpp
   test/circular_queue.cpp
+  test/assert.cpp
 )
+
+target_include_directories(ate_containers PRIVATE test)
 
 target_link_libraries(
   containers_test
