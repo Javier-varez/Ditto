@@ -7,9 +7,9 @@
 #include <type_traits>
 #include <utility>
 
-#include "ATE/type_traits.h"  // IWYU pragma: keep
+#include "ditto/type_traits.h"  // IWYU pragma: keep
 
-namespace ATE {
+namespace Ditto {
 
 /**
  * @brief Statically allocated polymorphic object. Can hold an object of any of
@@ -84,4 +84,4 @@ class PolymorphicObject {
                 "Not all classes derive from base");
 };
 
-}  // namespace ATE
+}  // namespace Ditto

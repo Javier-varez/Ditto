@@ -5,11 +5,11 @@
 #include <cstddef>
 #include <optional>
 
-#include "ATE/circular_queue.h"
-#include "ATE/linear_map.h"
-#include "ATE/non_null_ptr.h"
+#include "ditto/circular_queue.h"
+#include "ditto/linear_map.h"
+#include "ditto/non_null_ptr.h"
 
-namespace ATE {
+namespace Ditto {
 
 template <class Event, class HAL, std::size_t MAX_INFLIGHT_EVENTS = 10,
           std::size_t MAX_LISTENERS = 10>
@@ -69,4 +69,4 @@ class EventLoop {
   std::atomic_bool m_running{true};
 };
 
-}  // namespace ATE
+}  // namespace Ditto

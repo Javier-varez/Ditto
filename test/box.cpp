@@ -1,13 +1,13 @@
 
-#include "ATE/box.h"
+#include "ditto/box.h"
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include <string>
 
-using ATE::Box;
-using ATE::make_box;
+using Ditto::Box;
+using Ditto::make_box;
 using testing::ElementsAreArray;
 
 TEST(BoxTest, DefaultConstructor) {

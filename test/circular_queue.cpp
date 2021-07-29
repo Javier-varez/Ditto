@@ -1,12 +1,12 @@
 
-#include "ATE/circular_queue.h"
+#include "ditto/circular_queue.h"
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include <string>
 
-using ATE::CircularQueue;
+using Ditto::CircularQueue;
 using testing::Mock;
 using testing::StrictMock;
 

@@ -4,9 +4,9 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "ATE/assert.h"
+#include "ditto/assert.h"
 
-namespace ATE {
+namespace Ditto {
 
 class MockAssert {
  public:
@@ -15,4 +15,4 @@ class MockAssert {
 
 extern testing::StrictMock<MockAssert>* g_assert;
 
-}  // namespace ATE
+}  // namespace Ditto

@@ -4,13 +4,13 @@
 #include <algorithm>
 #include <cstddef>
 
-#include "ATE/hash.h"
-#include "ATE/linked_list.h"
-#include "ATE/pair.h"
+#include "ditto/hash.h"
+#include "ditto/linked_list.h"
+#include "ditto/pair.h"
 
-namespace ATE {
+namespace Ditto {
 
-template <class K, class V, class HASH = ATE::Hash>
+template <class K, class V, class HASH = Ditto::Hash>
 class HashMap {
  public:
   HashMap() = default;
@@ -87,4 +87,4 @@ class HashMap {
   friend class HashMapTest;
 };
 
-}  // namespace ATE
+}  // namespace Ditto

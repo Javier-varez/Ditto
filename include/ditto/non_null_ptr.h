@@ -1,9 +1,9 @@
 
 #pragma once
 
-#include "ATE/assert.h"
+#include "ditto/assert.h"
 
-namespace ATE {
+namespace Ditto {
 /**
  * @brief Non owning pointer that cannot be null
  */
@@ -11,7 +11,7 @@ namespace ATE {
 template <class T>
 class NonNullPtr final {
  public:
-  NonNullPtr(T* _Nonnull ptr) : m_ptr(ptr) { ATE_VERIFY(m_ptr != nullptr); }
+  NonNullPtr(T* _Nonnull ptr) : m_ptr(ptr) { DITTO_VERIFY(m_ptr != nullptr); }
 
   NonNullPtr(const NonNullPtr&) = default;
   NonNullPtr(NonNullPtr&&) = default;
@@ -28,4 +28,4 @@ class NonNullPtr final {
   T* _Nonnull m_ptr;
 };
 
-}  // namespace ATE
+}  // namespace Ditto

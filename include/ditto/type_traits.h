@@ -3,7 +3,7 @@
 
 #include <type_traits>
 
-namespace ATE {
+namespace Ditto {
 
 template <typename...>
 struct is_one_of {
@@ -19,4 +19,4 @@ struct is_one_of<F, S, T...> {
 template <class F, class S, class... T>
 constexpr inline bool is_one_of_v = is_one_of<F, S, T...>::value;
 
-}  // namespace ATE
+}  // namespace Ditto

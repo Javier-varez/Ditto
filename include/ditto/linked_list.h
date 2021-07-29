@@ -6,9 +6,9 @@
 #include <type_traits>
 #include <utility>
 
-#include "ATE/box.h"
+#include "ditto/box.h"
 
-namespace ATE {
+namespace Ditto {
 
 template <class T>
 struct LinkedListNode {
@@ -308,4 +308,4 @@ class LinkedList {
   }
 };
 
-}  // namespace ATE
+}  // namespace Ditto

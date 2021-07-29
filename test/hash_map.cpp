@@ -1,11 +1,11 @@
-#include "ATE/hash_map.h"
+#include "ditto/hash_map.h"
 
 #include <gtest/gtest.h>
 
 #include <memory>
 
-using ATE::Hash;
-using ATE::HashMap;
+using Ditto::Hash;
+using Ditto::HashMap;
 
 TEST(HashMapTest, TinyMap) {
   HashMap<int, int> tiny_map{2};

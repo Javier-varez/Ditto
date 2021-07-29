@@ -1,10 +1,10 @@
-#include "ATE/linear_map.h"
+#include "ditto/linear_map.h"
 
 #include <gtest/gtest.h>
 
 #include <string>
 
-using ATE::LinearMap;
+using Ditto::LinearMap;
 
 TEST(LinearMapTest, TinyMap) {
   LinearMap<int, int, 4> tiny_map;

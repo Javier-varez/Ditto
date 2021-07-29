@@ -3,9 +3,9 @@
 
 #include <span>
 
-#include "ATE/polymorphic_object.h"
+#include "ditto/polymorphic_object.h"
 
-namespace ATE {
+namespace Ditto {
 
 template <class StateId, class EventId>
 class State {
@@ -27,7 +27,7 @@ class StateMachine {
   };
 
   using PolymorphicState =
-      ATE::PolymorphicObject<State<StateId, EventId>, States...>;
+      Ditto::PolymorphicObject<State<StateId, EventId>, States...>;
 
   class StateFactory {
    public:
@@ -75,4 +75,4 @@ class StateMachine {
   }
 };
 
-}  // namespace ATE
+}  // namespace Ditto
