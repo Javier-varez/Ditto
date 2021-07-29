@@ -1,12 +1,10 @@
 
 #include "ATE/box.h"
 
-#include <gmock/gmock-matchers.h>
-#include <gtest/gtest-message.h>
-#include <gtest/gtest-test-part.h>
-#include <gtest/gtest_pred_impl.h>
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
-#include <memory>
+#include <string>
 
 using ATE::Box;
 using ATE::make_box;

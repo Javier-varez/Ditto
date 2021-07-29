@@ -1,5 +1,11 @@
 
+#include "ATE/assert.h"
+
+#include <gmock/gmock.h>
+
 #include "assert_mock.h"
+
+// IWYU pragma: no_forward_declare ATE::MockAssert
 
 namespace ATE {
 
