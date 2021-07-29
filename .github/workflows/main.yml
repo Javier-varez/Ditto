@@ -22,10 +22,10 @@ jobs:
       with:
         cmakeListsOrSettingsJson: 'CMakeListsTxtAdvanced'
         cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
-        cmakeAppendedArgs: '-D BUILD_CONTAINER_TESTS=ON'
+        cmakeAppendedArgs: '-D BUILD_DITTO_TESTS=ON'
         buildDirectory: '${{ github.workspace }}/build'
       env:
         CC: ${{ matrix.os == 'ubuntu-latest' && 'clang-12' || 'clang' }}
         CXX: ${{ matrix.os == 'ubuntu-latest' && 'clang++-12' || 'clang++' }}
     - name: Execute tests
-      run: '${{ github.workspace }}/build/containers_test'
+      run: '${{ github.workspace }}/build/DittoTests'
