@@ -43,6 +43,7 @@ add_executable(
   test/circular_queue.cpp
   test/non_null_ptr.cpp
   test/assert.cpp
+  test/event_loop.cpp
 )
 
 target_include_directories(ate_containers PRIVATE test)
