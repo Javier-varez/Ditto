@@ -1,0 +1,7 @@
+BasedOnStyle: Google
+
+---
+Language: Cpp
+AlwaysBreakTemplateDeclarations: true
+PointerAlignment: Left
+---
