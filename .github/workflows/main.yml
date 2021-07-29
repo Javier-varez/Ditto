@@ -29,3 +29,15 @@ jobs:
         CXX: ${{ matrix.os == 'ubuntu-latest' && 'clang++-12' || 'clang++' }}
     - name: Execute tests
       run: '${{ github.workspace }}/build/DittoTests'
+
+  clang_format:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: clang-format lint
+      uses: DoozyX/clang-format-lint-action@v0.11
+      with:
+        source: '.'
+        clangFormatVersion: 10
