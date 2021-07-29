@@ -1,4 +1,4 @@
-name: Containers
+name: Ditto
 
 on:
   push:
