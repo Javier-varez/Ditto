@@ -8,7 +8,7 @@ add_library(
   STATIC
   src/assert.cpp
 )
-target_include_directories(Ditto PUBLIC inc)
+target_include_directories(Ditto PUBLIC include)
 
 target_compile_features(Ditto PUBLIC cxx_std_20)
 
