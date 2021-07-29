@@ -1,7 +1,7 @@
 
 #pragma once
 
-namespace ATE {
+namespace Ditto {
 template <class L, class R>
 class Pair {
  public:
@@ -20,4 +20,4 @@ class Pair {
   R m_right;
 };
 
-}  // namespace ATE
+}  // namespace Ditto

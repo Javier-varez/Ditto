@@ -2,7 +2,7 @@
 #include <cstdint>
 #include <type_traits>
 
-namespace ATE {
+namespace Ditto {
 
 class Hash {
  public:
@@ -24,4 +24,4 @@ class Hash {
   }
 };
 
-}  // namespace ATE
+}  // namespace Ditto

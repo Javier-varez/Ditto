@@ -3,7 +3,7 @@
 
 #include <utility>
 
-namespace ATE {
+namespace Ditto {
 template <class T>
 class Box {
  public:
@@ -55,4 +55,4 @@ inline auto make_box(Args... args) -> Box<T> {
   return Box<T>{new T{std::forward<Args>(args)...}};
 }
 
-}  // namespace ATE
+}  // namespace Ditto

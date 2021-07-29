@@ -1,11 +1,11 @@
 
-#include "ATE/pair.h"
+#include "ditto/pair.h"
 
 #include <gtest/gtest.h>
 
 #include <string>
 
-using ATE::Pair;
+using Ditto::Pair;
 
 TEST(PairTest, Constructor) {
   Pair<int, std::string> pair{1, "cool!"};

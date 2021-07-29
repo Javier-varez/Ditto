@@ -7,7 +7,7 @@
 #include <optional>
 #include <utility>
 
-namespace ATE {
+namespace Ditto {
 
 template <class K, class V, std::size_t CAPACITY>
 class LinearMap {
@@ -128,4 +128,4 @@ class LinearMap {
   friend class LinearMapTest;
 };
 
-}  // namespace ATE
+}  // namespace Ditto

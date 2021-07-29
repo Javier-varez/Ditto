@@ -1,5 +1,5 @@
 
-#include "ATE/event_loop.h"
+#include "ditto/event_loop.h"
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -22,7 +22,7 @@ class Hal {
   MOCK_METHOD(void, enable_interrupts, (), ());
 };
 
-using EventLoop = ATE::EventLoop<Event, Hal>;
+using EventLoop = Ditto::EventLoop<Event, Hal>;
 
 class MockListener : public EventLoop::Listener {
  public:

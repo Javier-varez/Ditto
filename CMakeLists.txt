@@ -24,7 +24,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 
 # We use the address sanitizer to ensure we are not leaking memory or triggering undefined behavior
-set(ATE_BUILD_OPTIONS
+set(DITTO_BUILD_OPTIONS
   -fsanitize=address,undefined
   -g3
   -Os
@@ -61,31 +61,31 @@ target_compile_features(DittoTests PRIVATE cxx_std_20)
 target_compile_options(
   gtest_main
   PRIVATE
-  ${ATE_BUILD_OPTIONS}
+  ${DITTO_BUILD_OPTIONS}
 )
 
 target_compile_options(
   gtest
   PRIVATE
-  ${ATE_BUILD_OPTIONS}
+  ${DITTO_BUILD_OPTIONS}
 )
 
 target_compile_options(
   gmock
   PRIVATE
-  ${ATE_BUILD_OPTIONS}
+  ${DITTO_BUILD_OPTIONS}
 )
 
 target_compile_options(
   DittoTests
   PRIVATE
-  ${ATE_BUILD_OPTIONS}
+  ${DITTO_BUILD_OPTIONS}
 )
 
 target_link_options(
   DittoTests
   PRIVATE
-  ${ATE_BUILD_OPTIONS}
+  ${DITTO_BUILD_OPTIONS}
 )
 
 include(GoogleTest)

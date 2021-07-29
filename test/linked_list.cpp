@@ -1,5 +1,5 @@
 
-#include "ATE/linked_list.h"
+#include "ditto/linked_list.h"
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -7,7 +7,7 @@
 #include <array>
 #include <vector>
 
-using ATE::LinkedList;
+using Ditto::LinkedList;
 using testing::ElementsAreArray;
 
 TEST(LinkedList, PushBack) {

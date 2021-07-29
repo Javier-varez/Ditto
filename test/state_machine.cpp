@@ -1,13 +1,13 @@
 
-#include "ATE/state_machine.h"
+#include "ditto/state_machine.h"
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include <memory>
 
-using ATE::State;
-using ATE::StateMachine;
+using Ditto::State;
+using Ditto::StateMachine;
 using testing::InSequence;
 using testing::StrictMock;
 

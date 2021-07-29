@@ -1,12 +1,12 @@
 
-#include "ATE/polymorphic_object.h"
+#include "ditto/polymorphic_object.h"
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include <memory>
 
-using ATE::PolymorphicObject;
+using Ditto::PolymorphicObject;
 using testing::ElementsAreArray;
 
 class Base {

@@ -9,7 +9,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace ATE {
+namespace Ditto {
 /**
  * @brief The CircularQueue is an abstraction of a ring buffer which acts like
  *        a FIFO memory. It has an associated size given in number of elements
@@ -156,4 +156,4 @@ class CircularQueue {
       m_element_storage;
 };
 
-}  // namespace ATE
+}  // namespace Ditto
