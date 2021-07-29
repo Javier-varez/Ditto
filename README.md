@@ -36,3 +36,12 @@ target_link_libraries(<TARGET_NAME> PRIVATE Ditto)
 
 ## Contributing
 
+Feel free to contribute to this project and open issues. Appreciated contributions include, but are not limited to:
+  * Bug reports
+  * Code contributions
+  * Documentation contributions
+  * Issues
+  * Feature requests
+
+Happy coding!
+
