@@ -23,8 +23,9 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
+# We use the address sanitizer to ensure we are not leaking memory or triggering undefined behavior
 set(ATE_BUILD_OPTIONS
-  -fsanitize=address
+  -fsanitize=address,undefined
   -g3
   -Os
 )
