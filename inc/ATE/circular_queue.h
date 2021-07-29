@@ -2,7 +2,7 @@
 #pragma once
 
 #include <array>
-#include <compare>
+#include <compare>  // IWYU pragma: keep
 #include <cstddef>
 #include <new>
 #include <optional>

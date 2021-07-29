@@ -7,7 +7,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "ATE/type_traits.h"
+#include "ATE/type_traits.h"  // IWYU pragma: keep
 
 namespace ATE {
 

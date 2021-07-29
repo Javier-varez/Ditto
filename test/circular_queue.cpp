@@ -1,14 +1,10 @@
 
 #include "ATE/circular_queue.h"
 
-#include <gmock/gmock-function-mocker.h>
-#include <gmock/gmock-nice-strict.h>
-#include <gmock/gmock-spec-builders.h>
-#include <gtest/gtest-message.h>
-#include <gtest/gtest-test-part.h>
-#include <gtest/gtest_pred_impl.h>
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
-#include <memory>
+#include <string>
 
 using ATE::CircularQueue;
 using testing::Mock;

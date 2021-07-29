@@ -2,11 +2,12 @@
 #pragma once
 
 #include <atomic>
+#include <cstddef>
+#include <optional>
 
 #include "ATE/circular_queue.h"
 #include "ATE/linear_map.h"
 #include "ATE/non_null_ptr.h"
-#include "ATE/pair.h"
 
 namespace ATE {
 
