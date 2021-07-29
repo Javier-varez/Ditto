@@ -1,20 +1,20 @@
 cmake_minimum_required(VERSION 3.14)
-project(containers)
+project(Ditto)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS true)
 
 add_library(
-  ate_containers
+  Ditto
   STATIC
   src/assert.cpp
 )
-target_include_directories(ate_containers PUBLIC inc)
+target_include_directories(Ditto PUBLIC inc)
 
-target_compile_features(ate_containers PUBLIC cxx_std_20)
+target_compile_features(Ditto PUBLIC cxx_std_20)
 
-option(BUILD_CONTAINER_TESTS "Builds the containers tests" OFF)
+option(BUILD_DITTO_TESTS "Builds tests for the Ditto library" OFF)
 
-if(BUILD_CONTAINER_TESTS)
+if(BUILD_DITTO_TESTS)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -32,7 +32,7 @@ set(ATE_BUILD_OPTIONS
 enable_testing()
 
 add_executable(
-  containers_test
+  DittoTests
   test/linked_list.cpp
   test/pair.cpp
   test/hash_map.cpp
@@ -46,16 +46,16 @@ add_executable(
   test/event_loop.cpp
 )
 
-target_include_directories(ate_containers PRIVATE test)
+target_include_directories(DittoTests PRIVATE test)
 
 target_link_libraries(
-  containers_test
-  ate_containers
+  DittoTests
+  Ditto
   gtest_main
   gmock
 )
 
-target_compile_features(containers_test INTERFACE cxx_std_20)
+target_compile_features(DittoTests PRIVATE cxx_std_20)
 
 target_compile_options(
   gtest_main
@@ -76,18 +76,18 @@ target_compile_options(
 )
 
 target_compile_options(
-  containers_test
+  DittoTests
   PRIVATE
   ${ATE_BUILD_OPTIONS}
 )
 
 target_link_options(
-  containers_test
+  DittoTests
   PRIVATE
   ${ATE_BUILD_OPTIONS}
 )
 
 include(GoogleTest)
-gtest_discover_tests(containers_test)
+gtest_discover_tests(DittoTests)
 
 endif()
