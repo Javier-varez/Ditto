@@ -45,6 +45,7 @@ add_executable(
   test/non_null_ptr.cpp
   test/assert.cpp
   test/event_loop.cpp
+  test/result.cpp
 )
 
 target_include_directories(DittoTests PRIVATE test)
