@@ -1,15 +1,27 @@
 
 #pragma once
 
-namespace Ditto {
-
-void assert_failed(const char* condition, int line, const char* file);
-
 #define DITTO_STRINGIFY(s) #s
 
-#define DITTO_VERIFY(x)                                    \
-  if (!(x)) {                                              \
-    assert_failed(DITTO_STRINGIFY(x), __LINE__, __FILE__); \
+#ifndef NDEBUG
+
+namespace Ditto {
+void assert_failed(const char* condition, int line, const char* file);
+
+void unimplemented(const char* function, int line, const char* file);
+}  // namespace Ditto
+
+#define DITTO_VERIFY(x)                                           \
+  if (!(x)) {                                                     \
+    Ditto::assert_failed(DITTO_STRINGIFY(x), __LINE__, __FILE__); \
   }
 
-}  // namespace Ditto
+#define DITTO_UNIMPLEMENTED() \
+  Ditto::unimplemented(__PRETTY_FUNCTION__, __LINE__, __FILE__)
+
+#else
+
+#define DITTO_VERIFY(x) (x)
+#define DITTO_UNIMPLEMENTED()
+
+#endif
