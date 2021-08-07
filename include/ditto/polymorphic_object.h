@@ -77,7 +77,7 @@ class PolymorphicObject {
  private:
   constexpr static size_t ALIGNMENT = std::max({alignof(DerivedClasses)...});
   constexpr static size_t BUFFER_SIZE = std::max({sizeof(DerivedClasses)...});
-  typename std::aligned_storage<ALIGNMENT, BUFFER_SIZE>::type m_memory_buffer;
+  typename std::aligned_storage<BUFFER_SIZE, ALIGNMENT>::type m_memory_buffer;
   Base* m_ptr = nullptr;
 
   static_assert((std::is_base_of_v<Base, DerivedClasses> && ...),

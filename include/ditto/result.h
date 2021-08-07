@@ -72,7 +72,7 @@ class Result {
   constexpr static std::size_t ALIGNMENT = std::max(alignof(Ok), alignof(Err));
   constexpr static std::size_t BUFFER_SIZE = std::max(sizeof(Ok), sizeof(Err));
   bool m_is_ok = false;
-  typename std::aligned_storage<ALIGNMENT, BUFFER_SIZE>::type m_memory_buffer;
+  typename std::aligned_storage<BUFFER_SIZE, ALIGNMENT>::type m_memory_buffer;
 
   Result() = default;
 };
@@ -119,7 +119,7 @@ class Result<Ok, void> {
   constexpr static std::size_t ALIGNMENT = alignof(Ok);
   constexpr static std::size_t BUFFER_SIZE = sizeof(Ok);
   bool m_is_ok = false;
-  typename std::aligned_storage<ALIGNMENT, BUFFER_SIZE>::type m_memory_buffer;
+  typename std::aligned_storage<BUFFER_SIZE, ALIGNMENT>::type m_memory_buffer;
 
   Result() = default;
 };
@@ -170,7 +170,7 @@ class Result<void, Err> {
   constexpr static std::size_t ALIGNMENT = alignof(Err);
   constexpr static std::size_t BUFFER_SIZE = sizeof(Err);
   bool m_is_ok = false;
-  typename std::aligned_storage<ALIGNMENT, BUFFER_SIZE>::type m_memory_buffer;
+  typename std::aligned_storage<BUFFER_SIZE, ALIGNMENT>::type m_memory_buffer;
 
   Result() = default;
 };
