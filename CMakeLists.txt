@@ -47,6 +47,7 @@ add_executable(
   test/event_loop.cpp
   test/result.cpp
   test/badge.cpp
+  test/fixed.cpp
 )
 
 target_include_directories(DittoTests PRIVATE test)

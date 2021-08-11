@@ -16,6 +16,7 @@ Generic reusable C++ software components for both embedded and general purpose s
   * `Ditto::EventLoop`: Implementation of an event loop for embedded use. It follows the observer pattern for Events and loops through an event queue distributing events to its subscriptors.
   * `Ditto::Badge`: Implements the Badge pattern. Functions taking a Badge object can only be called from the templated class of the Badge, since a badge can only be constructed from this templated class.
   * `Ditto::Result`: Encapsulation of the return type of a function. Could either be and Ok value or an Error and has method to find out which one it is and obtain the value.
+  * `Ditto::FixedPoint`: Implements a fixed point integer with support for common operations.
   * It features a custom assert implementation that can be overriden by the user.
 
 
