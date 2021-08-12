@@ -16,6 +16,11 @@ class FixedPoint {
   constexpr FixedPoint() = default;
   constexpr explicit FixedPoint(T value) : m_underlying(value) {}
 
+  template <class U,
+            std::enable_if_t<std::is_floating_point_v<U>, bool> = false>
+  constexpr explicit FixedPoint(U value)
+      : m_underlying(static_cast<T>(value * double{1ULL << FRAC})) {}
+
   template <class U, std::uint32_t OTHER_FRAC>
   constexpr explicit FixedPoint(FixedPoint<U, OTHER_FRAC> other) {
     if constexpr (FRAC > OTHER_FRAC) {
@@ -25,7 +30,7 @@ class FixedPoint {
     }
   }
 
-  explicit operator double() {
+  explicit constexpr operator double() {
     return static_cast<double>(m_underlying) / powl(2, FRAC);
   }
 
@@ -53,8 +58,10 @@ class FixedPoint {
         m_underlying / other.m_underlying};
   }
 
+  constexpr T raw() const { return m_underlying; }
+
   using primitive_type = T;
-  constexpr static std::uint32_t fraction_bits = FRAC;
+  constexpr static inline std::uint32_t fraction_bits = FRAC;
 
  private:
   T m_underlying{};
@@ -74,21 +81,20 @@ using FP16 = FixedPoint<std::uint16_t, FRAC>;
 template <std::uint32_t FRAC>
 using FP32 = FixedPoint<std::uint32_t, FRAC>;
 
+template <std::uint32_t FRAC>
+using FP64 = FixedPoint<std::uint64_t, FRAC>;
+
 namespace numeric_literals {
 
-constexpr FP8<8> operator"" _uq0_8(long double val) {
-  auto int_val = static_cast<std::uint8_t>(val * 256.0);
-  return FP8<8>{int_val};
-}
+constexpr FP8<8> operator"" _uq0_8(long double val) { return FP8<8>{val}; }
+constexpr FP8<4> operator"" _uq4_4(long double val) { return FP8<4>{val}; }
 
-constexpr FP16<16> operator"" _uq0_16(long double val) {
-  auto int_val = static_cast<std::uint16_t>(val * 65536.0);
-  return FP16<16>{int_val};
-}
+constexpr FP16<16> operator"" _uq0_16(long double val) { return FP16<16>{val}; }
+constexpr FP16<8> operator"" _uq8_8(long double val) { return FP16<8>{val}; }
 
-constexpr FP32<32> operator"" _uq0_32(long double val) {
-  auto int_val = static_cast<std::uint32_t>(val * 4294967296.0);
-  return FP32<32>{int_val};
+constexpr FP32<32> operator"" _uq0_32(long double val) { return FP32<32>{val}; }
+constexpr FP32<16> operator"" _uq16_16(long double val) {
+  return FP32<16>{val};
 }
 
 }  // namespace numeric_literals
