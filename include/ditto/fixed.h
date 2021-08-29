@@ -91,7 +91,7 @@ class FixedPoint {
   template <class U, std::uint32_t OTHER_FRAC>
   friend class FixedPoint;
 
-  static_assert(std::is_integral_v<T>);
+  static_assert(std::is_integral_v<T> && std::is_unsigned_v<T>);
 };
 
 template <std::uint32_t FRAC>
