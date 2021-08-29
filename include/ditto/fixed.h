@@ -13,19 +13,27 @@ namespace Ditto {
 template <class T, std::uint32_t FRAC>
 class FixedPoint {
  public:
+  /// Constructors and creation static functions
   constexpr FixedPoint() = default;
-  constexpr explicit FixedPoint(T value) : m_underlying(value) {}
 
   template <class U,
             std::enable_if_t<std::is_floating_point_v<U>, bool> = false>
-  constexpr explicit FixedPoint(U value)
-      : m_underlying(static_cast<T>(value * double{1ULL << FRAC})) {}
+  constexpr static FixedPoint from_floating_point(U value) {
+    return FixedPoint{static_cast<T>(value * double{1ULL << FRAC})};
+  }
 
   template <class U,
             std::enable_if_t<std::is_integral_v<U> && std::is_unsigned_v<U>,
                              bool> = false>
   constexpr static FixedPoint from_integer(U value) {
     return FixedPoint{value << FRAC};
+  }
+
+  template <class U,
+            std::enable_if_t<std::is_integral_v<U> && std::is_unsigned_v<U>,
+                             bool> = false>
+  constexpr static FixedPoint from_raw(U underlying) {
+    return FixedPoint{underlying};
   }
 
   template <class U, std::uint32_t OTHER_FRAC>
@@ -37,23 +45,37 @@ class FixedPoint {
     }
   }
 
-  explicit constexpr operator double() {
-    return static_cast<double>(m_underlying) / powl(2, FRAC);
+  // Types of the operations
+  using primitive_type = T;
+  constexpr static inline std::uint32_t fraction_bits = FRAC;
+
+  using add_underlying = std::make_unsigned_t<decltype(T{} + T{})>;
+  using sub_underlying = std::make_unsigned_t<decltype(T{} - T{})>;
+  template <class U>
+  using mul_underlying = std::make_unsigned_t<decltype(T{} * U{})>;
+  template <class U>
+  using div_underlying = std::make_unsigned_t<decltype(T{} / U{})>;
+
+  using add_result = FixedPoint<add_underlying, FRAC>;
+  using sub_result = FixedPoint<sub_underlying, FRAC>;
+  template <class U, std::uint32_t OTHER_FRAC>
+  using mul_result = FixedPoint<mul_underlying<U>, FRAC + OTHER_FRAC>;
+  template <class U, std::uint32_t OTHER_FRAC>
+  using div_result = FixedPoint<div_underlying<U>, FRAC - OTHER_FRAC>;
+
+  // Operators
+
+  constexpr inline add_result operator+(FixedPoint other) {
+    return add_result{add_underlying{m_underlying} + other.m_underlying};
   }
 
-  constexpr FixedPoint<decltype(T{} + T{}), FRAC> operator+(FixedPoint other) {
-    return FixedPoint<decltype(T{} + T{}), FRAC>{
-        decltype(T{} + T{}){m_underlying} + other.m_underlying};
-  }
-
-  constexpr FixedPoint& operator+=(FixedPoint other) {
+  constexpr inline FixedPoint& operator+=(FixedPoint other) {
     m_underlying += other.m_underlying;
     return *this;
   }
 
-  constexpr FixedPoint<decltype(T{} - T{}), FRAC> operator-(FixedPoint other) {
-    return FixedPoint<decltype(T{} - T{}), FRAC>{
-        decltype(T{} - T{}){m_underlying} - other.m_underlying};
+  constexpr sub_result operator-(FixedPoint other) {
+    return sub_result{sub_underlying{m_underlying} - other.m_underlying};
   }
 
   constexpr FixedPoint& operator-=(FixedPoint other) {
@@ -62,28 +84,30 @@ class FixedPoint {
   }
 
   template <class U, std::uint32_t OTHER_FRAC>
-  constexpr FixedPoint<decltype(T{} * U{}), FRAC + OTHER_FRAC> operator*(
+  constexpr mul_result<U, OTHER_FRAC> operator*(
       FixedPoint<U, OTHER_FRAC> other) {
-    return FixedPoint<decltype(U{} * T{}), FRAC + OTHER_FRAC>{
-        decltype(T{} * T{}){m_underlying} * other.m_underlying};
+    return mul_result<U, OTHER_FRAC>{mul_underlying<U>{m_underlying} *
+                                     other.m_underlying};
   }
 
   template <class U, std::uint32_t OTHER_FRAC>
-  constexpr FixedPoint<decltype(T{} / U{}), FRAC - OTHER_FRAC> operator/(
+  constexpr div_result<U, OTHER_FRAC> operator/(
       FixedPoint<U, OTHER_FRAC> other) {
-    return FixedPoint<decltype(T{} / U{}), FRAC - OTHER_FRAC>{
-        m_underlying / other.m_underlying};
+    return div_result<U, OTHER_FRAC>{div_underlying<U>{m_underlying} /
+                                     other.m_underlying};
   }
 
   template <class U, std::enable_if_t<std::is_integral_v<U>, bool> = false>
-  constexpr FixedPoint<decltype(T{} / U{}), FRAC> operator/(U value) {
-    return FixedPoint<decltype(T{} / U{}), FRAC>{m_underlying / value};
+  constexpr div_result<U, 0> operator/(U value) {
+    return div_result<U, 0>{div_underlying<U>{m_underlying} / value};
   }
 
-  constexpr T raw() const { return m_underlying; }
+  // Accessors and conversions
+  [[nodiscard]] constexpr T raw() const { return m_underlying; }
 
-  using primitive_type = T;
-  constexpr static inline std::uint32_t fraction_bits = FRAC;
+  [[nodiscard]] explicit constexpr operator double() {
+    return static_cast<double>(m_underlying) / powl(2, FRAC);
+  }
 
  private:
   T m_underlying{};
@@ -91,7 +115,11 @@ class FixedPoint {
   template <class U, std::uint32_t OTHER_FRAC>
   friend class FixedPoint;
 
-  static_assert(std::is_integral_v<T> && std::is_unsigned_v<T>);
+  // Constructor from underlying is private. Use from_* functions to construct
+  // values
+  constexpr explicit FixedPoint(T value) : m_underlying(value) {}
+
+  static_assert(std::is_integral_v<T>);
 };
 
 template <std::uint32_t FRAC>
@@ -108,15 +136,25 @@ using FP64 = FixedPoint<std::uint64_t, FRAC>;
 
 namespace numeric_literals {
 
-constexpr FP8<8> operator"" _uq0_8(long double val) { return FP8<8>{val}; }
-constexpr FP8<4> operator"" _uq4_4(long double val) { return FP8<4>{val}; }
+constexpr FP8<8> operator"" _uq0_8(long double val) {
+  return FP8<8>::from_floating_point(val);
+}
+constexpr FP8<4> operator"" _uq4_4(long double val) {
+  return FP8<4>::from_floating_point(val);
+}
 
-constexpr FP16<16> operator"" _uq0_16(long double val) { return FP16<16>{val}; }
-constexpr FP16<8> operator"" _uq8_8(long double val) { return FP16<8>{val}; }
+constexpr FP16<16> operator"" _uq0_16(long double val) {
+  return FP16<16>::from_floating_point(val);
+}
+constexpr FP16<8> operator"" _uq8_8(long double val) {
+  return FP16<8>::from_floating_point(val);
+}
 
-constexpr FP32<32> operator"" _uq0_32(long double val) { return FP32<32>{val}; }
+constexpr FP32<32> operator"" _uq0_32(long double val) {
+  return FP32<32>::from_floating_point(val);
+}
 constexpr FP32<16> operator"" _uq16_16(long double val) {
-  return FP32<16>{val};
+  return FP32<16>::from_floating_point(val);
 }
 
 }  // namespace numeric_literals

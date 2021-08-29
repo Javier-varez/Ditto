@@ -20,7 +20,7 @@ TEST(FixedPointTest, ConstructFromDouble) {
 }
 
 TEST(FixedPointTest, ConstructFromUnderlying) {
-  FP8<8> fp = FP8<8>(std::uint8_t{128U});
+  FP8<8> fp = FP8<8>::from_raw(std::uint8_t{128U});
 
   EXPECT_NEAR(double{fp}, 0.5, 1 / 256.0);
 }
