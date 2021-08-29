@@ -21,6 +21,13 @@ class FixedPoint {
   constexpr explicit FixedPoint(U value)
       : m_underlying(static_cast<T>(value * double{1ULL << FRAC})) {}
 
+  template <class U,
+            std::enable_if_t<std::is_integral_v<U> && std::is_unsigned_v<U>,
+                             bool> = false>
+  constexpr static FixedPoint from_integer(U value) {
+    return FixedPoint{value << FRAC};
+  }
+
   template <class U, std::uint32_t OTHER_FRAC>
   constexpr explicit FixedPoint(FixedPoint<U, OTHER_FRAC> other) {
     if constexpr (FRAC > OTHER_FRAC) {
@@ -39,9 +46,19 @@ class FixedPoint {
         decltype(T{} + T{}){m_underlying} + other.m_underlying};
   }
 
+  constexpr FixedPoint& operator+=(FixedPoint other) {
+    m_underlying += other.m_underlying;
+    return *this;
+  }
+
   constexpr FixedPoint<decltype(T{} - T{}), FRAC> operator-(FixedPoint other) {
     return FixedPoint<decltype(T{} - T{}), FRAC>{
         decltype(T{} - T{}){m_underlying} - other.m_underlying};
+  }
+
+  constexpr FixedPoint& operator-=(FixedPoint other) {
+    m_underlying -= other.m_underlying;
+    return *this;
   }
 
   template <class U, std::uint32_t OTHER_FRAC>
@@ -56,6 +73,11 @@ class FixedPoint {
       FixedPoint<U, OTHER_FRAC> other) {
     return FixedPoint<decltype(T{} / U{}), FRAC - OTHER_FRAC>{
         m_underlying / other.m_underlying};
+  }
+
+  template <class U, std::enable_if_t<std::is_integral_v<U>, bool> = false>
+  constexpr FixedPoint<decltype(T{} / U{}), FRAC> operator/(U value) {
+    return FixedPoint<decltype(T{} / U{}), FRAC>{m_underlying / value};
   }
 
   constexpr T raw() const { return m_underlying; }

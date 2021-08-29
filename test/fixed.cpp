@@ -50,3 +50,11 @@ TEST(FixedPointTest, Division) {
 
   EXPECT_NEAR(double{fp}, 4.266666, 1 / double{1ULL << 8});
 }
+
+TEST(FixedPointTest, FromInteger) {
+  auto denominator = 20.0_uq8_8;
+  auto numerator = FP32<17>::from_integer(750U);
+
+  FP32<9> result = numerator / denominator;
+  EXPECT_NEAR(double{result}, 37.5, 1 / double{1ULL << 9});
+}
