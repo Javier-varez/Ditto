@@ -18,21 +18,21 @@ class FixedPoint {
 
   template <class U,
             std::enable_if_t<std::is_floating_point_v<U>, bool> = false>
-  constexpr static FixedPoint from_floating_point(U value) {
+  constexpr static auto from_floating_point(U value) -> FixedPoint {
     return FixedPoint{static_cast<T>(value * double{1ULL << FRAC})};
   }
 
   template <class U,
             std::enable_if_t<std::is_integral_v<U> && std::is_unsigned_v<U>,
                              bool> = false>
-  constexpr static FixedPoint from_integer(U value) {
+  constexpr static auto from_integer(U value) -> FixedPoint {
     return FixedPoint{value << FRAC};
   }
 
   template <class U,
             std::enable_if_t<std::is_integral_v<U> && std::is_unsigned_v<U>,
                              bool> = false>
-  constexpr static FixedPoint from_raw(U underlying) {
+  constexpr static auto from_raw(U underlying) -> FixedPoint {
     return FixedPoint{underlying};
   }
 
@@ -65,45 +65,45 @@ class FixedPoint {
 
   // Operators
 
-  constexpr inline add_result operator+(FixedPoint other) {
+  constexpr inline auto operator+(FixedPoint other) -> add_result {
     return add_result{add_underlying{m_underlying} + other.m_underlying};
   }
 
-  constexpr inline FixedPoint& operator+=(FixedPoint other) {
+  constexpr inline auto operator+=(FixedPoint other) -> FixedPoint& {
     m_underlying += other.m_underlying;
     return *this;
   }
 
-  constexpr sub_result operator-(FixedPoint other) {
+  constexpr auto operator-(FixedPoint other) -> sub_result {
     return sub_result{sub_underlying{m_underlying} - other.m_underlying};
   }
 
-  constexpr FixedPoint& operator-=(FixedPoint other) {
+  constexpr auto operator-=(FixedPoint other) -> FixedPoint& {
     m_underlying -= other.m_underlying;
     return *this;
   }
 
   template <class U, std::uint32_t OTHER_FRAC>
-  constexpr mul_result<U, OTHER_FRAC> operator*(
-      FixedPoint<U, OTHER_FRAC> other) {
+  constexpr auto operator*(FixedPoint<U, OTHER_FRAC> other)
+      -> mul_result<U, OTHER_FRAC> {
     return mul_result<U, OTHER_FRAC>{mul_underlying<U>{m_underlying} *
                                      other.m_underlying};
   }
 
   template <class U, std::uint32_t OTHER_FRAC>
-  constexpr div_result<U, OTHER_FRAC> operator/(
-      FixedPoint<U, OTHER_FRAC> other) {
+  constexpr auto operator/(FixedPoint<U, OTHER_FRAC> other)
+      -> div_result<U, OTHER_FRAC> {
     return div_result<U, OTHER_FRAC>{div_underlying<U>{m_underlying} /
                                      other.m_underlying};
   }
 
   template <class U, std::enable_if_t<std::is_integral_v<U>, bool> = false>
-  constexpr div_result<U, 0> operator/(U value) {
+  constexpr auto operator/(U value) -> div_result<U, 0> {
     return div_result<U, 0>{div_underlying<U>{m_underlying} / value};
   }
 
   // Accessors and conversions
-  [[nodiscard]] constexpr T raw() const { return m_underlying; }
+  [[nodiscard]] constexpr auto raw() const -> T { return m_underlying; }
 
   [[nodiscard]] explicit constexpr operator double() {
     return static_cast<double>(m_underlying) / powl(2, FRAC);
@@ -136,24 +136,24 @@ using FP64 = FixedPoint<std::uint64_t, FRAC>;
 
 namespace numeric_literals {
 
-constexpr FP8<8> operator"" _uq0_8(long double val) {
+constexpr auto operator"" _uq0_8(long double val) -> FP8<8> {
   return FP8<8>::from_floating_point(val);
 }
-constexpr FP8<4> operator"" _uq4_4(long double val) {
+constexpr auto operator"" _uq4_4(long double val) -> FP8<4> {
   return FP8<4>::from_floating_point(val);
 }
 
-constexpr FP16<16> operator"" _uq0_16(long double val) {
+constexpr auto operator"" _uq0_16(long double val) -> FP16<16> {
   return FP16<16>::from_floating_point(val);
 }
-constexpr FP16<8> operator"" _uq8_8(long double val) {
+constexpr auto operator"" _uq8_8(long double val) -> FP16<8> {
   return FP16<8>::from_floating_point(val);
 }
 
-constexpr FP32<32> operator"" _uq0_32(long double val) {
+constexpr auto operator"" _uq0_32(long double val) -> FP32<32> {
   return FP32<32>::from_floating_point(val);
 }
-constexpr FP32<16> operator"" _uq16_16(long double val) {
+constexpr auto operator"" _uq16_16(long double val) -> FP32<16> {
   return FP32<16>::from_floating_point(val);
 }
 
