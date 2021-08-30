@@ -214,14 +214,14 @@ class FixedPoint {
   }
 
   // Accessors and conversions
-  [[nodiscard]] constexpr auto raw() const -> T { return m_underlying; }
-
-  [[nodiscard]] explicit constexpr operator double() {
-    return static_cast<double>(m_underlying) / powl(2, FRAC);
+  [[nodiscard]] constexpr inline auto as_raw() const -> T {
+    return m_underlying;
   }
-
   [[nodiscard]] constexpr inline auto as_integer() -> T {
     return m_underlying >> FRAC;
+  }
+  [[nodiscard]] constexpr inline auto as_double() -> double {
+    return static_cast<double>(m_underlying) / powl(2, FRAC);
   }
 
  private:
