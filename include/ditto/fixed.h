@@ -85,75 +85,132 @@ class FixedPoint {
     return *this;
   }
 
-  constexpr auto operator-(FixedPoint other) -> sub_result {
+  constexpr inline auto operator-(FixedPoint other) -> sub_result {
     return sub_result{sub_underlying{m_underlying} - other.m_underlying};
   }
 
   template <class U, std::enable_if_t<std::is_integral_v<U>, bool> = false>
-  constexpr auto operator-(U value) -> sub_result {
+  constexpr inline auto operator-(U value) -> sub_result {
     return sub_result{sub_underlying{m_underlying} - (value << FRAC)};
   }
 
-  constexpr auto operator-=(FixedPoint other) -> FixedPoint& {
+  constexpr inline auto operator-=(FixedPoint other) -> FixedPoint& {
     m_underlying -= other.m_underlying;
     return *this;
   }
 
   template <class U, std::enable_if_t<std::is_integral_v<U>, bool> = false>
-  constexpr auto operator-=(U value) -> FixedPoint& {
+  constexpr inline auto operator-=(U value) -> FixedPoint& {
     m_underlying -= value << FRAC;
     return *this;
   }
 
   template <class U, std::uint32_t OTHER_FRAC>
-  constexpr auto operator*(FixedPoint<U, OTHER_FRAC> other)
+  constexpr inline auto operator*(FixedPoint<U, OTHER_FRAC> other)
       -> mul_result<U, OTHER_FRAC> {
     return mul_result<U, OTHER_FRAC>{mul_underlying<U>{m_underlying} *
                                      other.m_underlying};
   }
 
   template <class U, std::enable_if_t<std::is_integral_v<U>, bool> = false>
-  constexpr auto operator*(U value) -> mul_result<U, 0> {
+  constexpr inline auto operator*(U value) -> mul_result<U, 0> {
     return mul_result<U, 0>{mul_underlying<U>{m_underlying} * value};
   }
 
   template <class U, std::uint32_t OTHER_FRAC>
-  constexpr auto operator*=(FixedPoint<U, OTHER_FRAC> other) -> FixedPoint& {
+  constexpr inline auto operator*=(FixedPoint<U, OTHER_FRAC> other)
+      -> FixedPoint& {
     auto val = m_underlying * other.m_underlying;
     m_underlying = val >> OTHER_FRAC;
     return *this;
   }
 
   template <class U, std::enable_if_t<std::is_integral_v<U>, bool> = false>
-  constexpr auto operator*=(U value) -> FixedPoint& {
+  constexpr inline auto operator*=(U value) -> FixedPoint& {
     m_underlying *= value;
     return *this;
   }
 
   template <class U, std::uint32_t OTHER_FRAC>
-  constexpr auto operator/(FixedPoint<U, OTHER_FRAC> other)
+  constexpr inline auto operator/(FixedPoint<U, OTHER_FRAC> other)
       -> div_result<U, OTHER_FRAC> {
     return div_result<U, OTHER_FRAC>{div_underlying<U>{m_underlying} /
                                      other.m_underlying};
   }
 
   template <class U, std::enable_if_t<std::is_integral_v<U>, bool> = false>
-  constexpr auto operator/(U value) -> div_result<U, 0> {
+  constexpr inline auto operator/(U value) -> div_result<U, 0> {
     return div_result<U, 0>{div_underlying<U>{m_underlying} / value};
   }
 
   template <class U, std::uint32_t OTHER_FRAC>
-  constexpr auto operator/=(FixedPoint<U, OTHER_FRAC> other) -> FixedPoint& {
+  constexpr inline auto operator/=(FixedPoint<U, OTHER_FRAC> other)
+      -> FixedPoint& {
     auto div = m_underlying / other.m_underlying;
     m_underlying = div << OTHER_FRAC;
     return *this;
   }
 
   template <class U, std::enable_if_t<std::is_integral_v<U>, bool> = false>
-  constexpr auto operator/=(U value) -> FixedPoint& {
+  constexpr inline auto operator/=(U value) -> FixedPoint& {
     auto div = m_underlying / value;
     m_underlying = div;
     return *this;
+  }
+
+  // Comparison operators
+  constexpr inline auto operator==(FixedPoint other) -> bool {
+    return m_underlying == other.m_underlying;
+  }
+
+  constexpr inline auto operator!=(FixedPoint other) -> bool {
+    return m_underlying != other.m_underlying;
+  }
+
+  constexpr inline auto operator>=(FixedPoint other) -> bool {
+    return m_underlying >= other.m_underlying;
+  }
+
+  constexpr inline auto operator>(FixedPoint other) -> bool {
+    return m_underlying > other.m_underlying;
+  }
+
+  constexpr inline auto operator<=(FixedPoint other) -> bool {
+    return m_underlying <= other.m_underlying;
+  }
+
+  constexpr inline auto operator<(FixedPoint other) -> bool {
+    return m_underlying < other.m_underlying;
+  }
+
+  template <class U, std::enable_if_t<std::is_integral_v<U>, bool> = false>
+  constexpr inline auto operator==(U value) -> bool {
+    return m_underlying == (static_cast<uint64_t>(value) << FRAC);
+  }
+
+  template <class U, std::enable_if_t<std::is_integral_v<U>, bool> = false>
+  constexpr inline auto operator!=(U value) -> bool {
+    return m_underlying != (static_cast<uint64_t>(value) << FRAC);
+  }
+
+  template <class U, std::enable_if_t<std::is_integral_v<U>, bool> = false>
+  constexpr inline auto operator>=(U value) -> bool {
+    return m_underlying >= (static_cast<uint64_t>(value) << FRAC);
+  }
+
+  template <class U, std::enable_if_t<std::is_integral_v<U>, bool> = false>
+  constexpr inline auto operator>(U value) -> bool {
+    return m_underlying > (static_cast<uint64_t>(value) << FRAC);
+  }
+
+  template <class U, std::enable_if_t<std::is_integral_v<U>, bool> = false>
+  constexpr inline auto operator<=(U value) -> bool {
+    return m_underlying <= (static_cast<uint64_t>(value) << FRAC);
+  }
+
+  template <class U, std::enable_if_t<std::is_integral_v<U>, bool> = false>
+  constexpr inline auto operator<(U value) -> bool {
+    return m_underlying < (static_cast<uint64_t>(value) << FRAC);
   }
 
   // Accessors and conversions
@@ -161,6 +218,10 @@ class FixedPoint {
 
   [[nodiscard]] explicit constexpr operator double() {
     return static_cast<double>(m_underlying) / powl(2, FRAC);
+  }
+
+  [[nodiscard]] constexpr inline auto as_integer() -> T {
+    return m_underlying >> FRAC;
   }
 
  private:

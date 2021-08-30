@@ -58,3 +58,24 @@ TEST(FixedPointTest, FromInteger) {
   FP32<9> result = numerator / denominator;
   EXPECT_NEAR(double{result}, 37.5, 1 / double{1ULL << 9});
 }
+
+TEST(FixedPointTest, ComparisonOperators) {
+  auto val = FP32<9>::from_floating_point(37.5);
+  EXPECT_FALSE(val < FP32<9>::from_floating_point(37.4));
+  EXPECT_TRUE(val > FP32<9>::from_floating_point(37.4));
+  EXPECT_TRUE(val < FP32<9>::from_floating_point(37.6));
+  EXPECT_FALSE(val > FP32<9>::from_floating_point(37.6));
+
+  EXPECT_TRUE(val >= FP32<9>::from_floating_point(37.5));
+  EXPECT_TRUE(val <= FP32<9>::from_floating_point(37.5));
+  EXPECT_FALSE(val > FP32<9>::from_floating_point(37.5));
+  EXPECT_FALSE(val < FP32<9>::from_floating_point(37.5));
+  EXPECT_TRUE(val == FP32<9>::from_floating_point(37.5));
+  EXPECT_FALSE(val == FP32<9>::from_floating_point(37.6));
+
+  EXPECT_FALSE(val == 37);
+  EXPECT_TRUE(val >= 37);
+  EXPECT_TRUE(val <= 38);
+  EXPECT_FALSE(val >= 38);
+  EXPECT_FALSE(val <= 37);
+}
