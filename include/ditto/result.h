@@ -14,6 +14,18 @@ namespace Ditto {
 template <class Ok, class Err>
 class Result {
  public:
+  // Implicit construction from an object of type Ok
+  Result(Ok val) {
+    new (&m_memory_buffer) Ok{std::move(val)};
+    m_is_ok = true;
+  }
+
+  Result(Err val) {
+    new (&m_memory_buffer) Err{std::move(val)};
+    m_is_ok = false;
+  }
+
+  /// Construct an Ok object with perfect forwarding
   template <class... Args>
   [[nodiscard]] static Result ok(Args... args) {
     Result result;
@@ -22,6 +34,7 @@ class Result {
     return result;
   }
 
+  /// Construct an Err object with perfect forwarding
   template <class... Args>
   [[nodiscard]] static Result error(Args... args) {
     Result result;
@@ -40,7 +53,7 @@ class Result {
 
   [[nodiscard]] Ok&& ok_value() && {
     DITTO_VERIFY(m_is_ok);
-    return *reinterpret_cast<Ok*>(&m_memory_buffer);
+    return std::move(*reinterpret_cast<Ok*>(&m_memory_buffer));
   }
 
   [[nodiscard]] Err& error_value() & {
@@ -50,7 +63,7 @@ class Result {
 
   [[nodiscard]] Err&& error_value() && {
     DITTO_VERIFY(!m_is_ok);
-    return *reinterpret_cast<Err*>(&m_memory_buffer);
+    return std::move(*reinterpret_cast<Err*>(&m_memory_buffer));
   }
 
   ~Result() {
@@ -74,12 +87,22 @@ class Result {
   bool m_is_ok = false;
   typename std::aligned_storage<BUFFER_SIZE, ALIGNMENT>::type m_memory_buffer;
 
+  static_assert(
+      !std::is_same_v<Ok, Err>,
+      "Cannot create a result where the Ok type and Err types are the same");
+
   Result() = default;
 };
 
 template <class Ok>
 class Result<Ok, void> {
  public:
+  // Implicit construction from an object of type Ok
+  Result(Ok val) {
+    new (&m_memory_buffer) Ok{std::move(val)};
+    m_is_ok = true;
+  }
+
   template <class... Args>
   [[nodiscard]] static Result ok(Args... args) {
     auto result = Result{};
@@ -100,7 +123,7 @@ class Result<Ok, void> {
 
   [[nodiscard]] Ok&& ok_value() && {
     DITTO_VERIFY(m_is_ok);
-    return *reinterpret_cast<Ok*>(&m_memory_buffer);
+    return std::move(*reinterpret_cast<Ok*>(&m_memory_buffer));
   }
 
   ~Result() {
@@ -121,12 +144,22 @@ class Result<Ok, void> {
   bool m_is_ok = false;
   typename std::aligned_storage<BUFFER_SIZE, ALIGNMENT>::type m_memory_buffer;
 
+  static_assert(
+      !std::is_same_v<Ok, void>,
+      "Cannot create a result where the Ok type and Err types are the same");
+
   Result() = default;
 };
 
 template <class Err>
 class Result<void, Err> {
  public:
+  // Implicit construction from an object of type Err
+  Result(Err val) {
+    new (&m_memory_buffer) Err{std::move(val)};
+    m_is_ok = false;
+  }
+
   [[nodiscard]] static Result ok() {
     Result result;
     result.m_is_ok = true;
@@ -151,7 +184,7 @@ class Result<void, Err> {
 
   [[nodiscard]] Err&& error_value() && {
     DITTO_VERIFY(!m_is_ok);
-    return *reinterpret_cast<Err*>(&m_memory_buffer);
+    return std::move(*reinterpret_cast<Err*>(&m_memory_buffer));
   }
 
   ~Result() {
@@ -172,7 +205,22 @@ class Result<void, Err> {
   bool m_is_ok = false;
   typename std::aligned_storage<BUFFER_SIZE, ALIGNMENT>::type m_memory_buffer;
 
+  static_assert(
+      !std::is_same_v<Err, void>,
+      "Cannot create a result where the Ok type and Err types are the same");
+
   Result() = default;
 };
+
+#define PROPAGATE(expression)                  \
+  ({                                           \
+    auto _result = expression;                 \
+    if (_result.is_error()) {                  \
+      /* This forces a move of the value*/     \
+      return std::move(_result).error_value(); \
+    }                                          \
+    /* This forces a move of the value*/       \
+    std::move(_result).ok_value();             \
+  })
 
 }  // namespace Ditto

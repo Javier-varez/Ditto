@@ -79,3 +79,30 @@ TEST(ResultTest, void_ok_enum_err) {
   EXPECT_EQ(Error::SOME_ERROR, result.error_value());
   Ditto::g_assert = nullptr;
 }
+
+TEST(ResultTest, propagater_error) {
+  auto divide_and_add = [](uint32_t numerator, uint32_t denominator,
+                           uint32_t add) -> Result<double, const char*> {
+    auto division = [](uint32_t numerator,
+                       uint32_t denominator) -> Result<uint32_t, const char*> {
+      if (denominator == 0) {
+        return Result<uint32_t, const char*>::error(
+            "Can't divide by 0, sorry :-(");
+      }
+      return Result<uint32_t, const char*>::ok(numerator / denominator);
+    };
+
+    uint32_t division_result = PROPAGATE(division(numerator, denominator));
+
+    return Result<double, const char*>::ok(
+        static_cast<double>(division_result + add));
+  };
+
+  auto result = divide_and_add(12, 0, 1);
+  EXPECT_TRUE(result.is_error());
+  EXPECT_STREQ(result.error_value(), "Can't divide by 0, sorry :-(");
+
+  result = divide_and_add(12, 2, 1);
+  EXPECT_TRUE(result.is_ok());
+  EXPECT_EQ(result.ok_value(), 7);
+}
