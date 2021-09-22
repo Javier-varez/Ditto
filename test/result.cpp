@@ -141,3 +141,37 @@ TEST(ResultTest, unwrap_or_else) {
   EXPECT_EQ(DITTO_UNWRAP_OR_ELSE(result, else_functor), 0);
   EXPECT_EQ(DITTO_UNWRAP_OR_ELSE(result, else_functor), 1);
 }
+
+TEST(ResultTest, unwrap_err) {
+  StrictMock<Ditto::MockAssert> assert;
+  Ditto::g_assert = &assert;
+
+  auto result = Result<const char*, uint32_t>::ok("");
+  EXPECT_CALL(assert, assert_failed(_, _, _));
+  DITTO_UNWRAP_ERR(result);
+
+  result = Result<const char*, uint32_t>::error(123U);
+  EXPECT_EQ(DITTO_UNWRAP_ERR(result), 123);
+
+  Ditto::g_assert = nullptr;
+}
+
+TEST(ResultTest, unwrap_err_or) {
+  auto result = Result<uint32_t, const char*>::ok(123U);
+  EXPECT_STREQ(DITTO_UNWRAP_ERR_OR(result, "alternative"), "alternative");
+
+  result = Result<uint32_t, const char*>::error("");
+  EXPECT_STREQ(DITTO_UNWRAP_ERR_OR(result, "alternative"), "");
+}
+
+TEST(ResultTest, unwrap_err_or_else) {
+  uint32_t i = 0;
+  auto else_functor = [&]() { return i++; };
+
+  auto result = Result<const char*, uint32_t>::error(123U);
+  EXPECT_EQ(DITTO_UNWRAP_ERR_OR_ELSE(result, else_functor), 123);
+
+  result = Result<const char*, uint32_t>::ok("");
+  EXPECT_EQ(DITTO_UNWRAP_ERR_OR_ELSE(result, else_functor), 0);
+  EXPECT_EQ(DITTO_UNWRAP_ERR_OR_ELSE(result, else_functor), 1);
+}
