@@ -255,4 +255,36 @@ class Result<void, Err> {
     unwrap_or();                                  \
   })
 
+#define DITTO_UNWRAP_ERR(expression)  \
+  ({                                  \
+    auto _result = expression;        \
+    std::move(_result).error_value(); \
+  })
+
+#define DITTO_UNWRAP_ERR_OR(expression, alternative) \
+  ({                                                 \
+    auto _result = expression;                       \
+    auto unwrap_or = [&]() {                         \
+      if (_result.is_error()) {                      \
+        return std::move(_result).error_value();     \
+      } else {                                       \
+        return alternative;                          \
+      }                                              \
+    };                                               \
+    unwrap_or();                                     \
+  })
+
+#define DITTO_UNWRAP_ERR_OR_ELSE(expression, functor) \
+  ({                                                  \
+    auto _result = expression;                        \
+    auto unwrap_or = [&]() {                          \
+      if (_result.is_error()) {                       \
+        return std::move(_result).error_value();      \
+      } else {                                        \
+        return functor();                             \
+      }                                               \
+    };                                                \
+    unwrap_or();                                      \
+  })
+
 }  // namespace Ditto
