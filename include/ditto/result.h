@@ -212,7 +212,7 @@ class Result<void, Err> {
   Result() = default;
 };
 
-#define PROPAGATE(expression)                  \
+#define DITTO_PROPAGATE(expression)            \
   ({                                           \
     auto _result = expression;                 \
     if (_result.is_error()) {                  \
@@ -221,6 +221,38 @@ class Result<void, Err> {
     }                                          \
     /* This forces a move of the value*/       \
     std::move(_result).ok_value();             \
+  })
+
+#define DITTO_UNWRAP(expression)   \
+  ({                               \
+    auto _result = expression;     \
+    std::move(_result).ok_value(); \
+  })
+
+#define DITTO_UNWRAP_OR(expression, alternative) \
+  ({                                             \
+    auto _result = expression;                   \
+    auto unwrap_or = [&]() {                     \
+      if (_result.is_ok()) {                     \
+        return std::move(_result).ok_value();    \
+      } else {                                   \
+        return alternative;                      \
+      }                                          \
+    };                                           \
+    unwrap_or();                                 \
+  })
+
+#define DITTO_UNWRAP_OR_ELSE(expression, functor) \
+  ({                                              \
+    auto _result = expression;                    \
+    auto unwrap_or = [&]() {                      \
+      if (_result.is_ok()) {                      \
+        return std::move(_result).ok_value();     \
+      } else {                                    \
+        return functor();                         \
+      }                                           \
+    };                                            \
+    unwrap_or();                                  \
   })
 
 }  // namespace Ditto
