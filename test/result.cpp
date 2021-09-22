@@ -80,7 +80,7 @@ TEST(ResultTest, void_ok_enum_err) {
   Ditto::g_assert = nullptr;
 }
 
-TEST(ResultTest, propagater_error) {
+TEST(ResultTest, propagate_error) {
   auto divide_and_add = [](uint32_t numerator, uint32_t denominator,
                            uint32_t add) -> Result<double, const char*> {
     auto division = [](uint32_t numerator,
@@ -92,7 +92,8 @@ TEST(ResultTest, propagater_error) {
       return Result<uint32_t, const char*>::ok(numerator / denominator);
     };
 
-    uint32_t division_result = PROPAGATE(division(numerator, denominator));
+    uint32_t division_result =
+        DITTO_PROPAGATE(division(numerator, denominator));
 
     return Result<double, const char*>::ok(
         static_cast<double>(division_result + add));
@@ -105,4 +106,38 @@ TEST(ResultTest, propagater_error) {
   result = divide_and_add(12, 2, 1);
   EXPECT_TRUE(result.is_ok());
   EXPECT_EQ(result.ok_value(), 7);
+}
+
+TEST(ResultTest, unwrap) {
+  StrictMock<Ditto::MockAssert> assert;
+  Ditto::g_assert = &assert;
+
+  auto result = Result<uint32_t, const char*>::ok(123U);
+  EXPECT_EQ(DITTO_UNWRAP(result), 123);
+
+  result = Result<uint32_t, const char*>::error("");
+  EXPECT_CALL(assert, assert_failed(_, _, _));
+  DITTO_UNWRAP(result);
+
+  Ditto::g_assert = nullptr;
+}
+
+TEST(ResultTest, unwrap_or) {
+  auto result = Result<uint32_t, const char*>::ok(123U);
+  EXPECT_EQ(DITTO_UNWRAP_OR(result, 0U), 123);
+
+  result = Result<uint32_t, const char*>::error("");
+  EXPECT_EQ(DITTO_UNWRAP_OR(result, 0U), 0);
+}
+
+TEST(ResultTest, unwrap_or_else) {
+  uint32_t i = 0;
+  auto else_functor = [&]() { return i++; };
+
+  auto result = Result<uint32_t, const char*>::ok(123U);
+  EXPECT_EQ(DITTO_UNWRAP_OR_ELSE(result, else_functor), 123);
+
+  result = Result<uint32_t, const char*>::error("");
+  EXPECT_EQ(DITTO_UNWRAP_OR_ELSE(result, else_functor), 0);
+  EXPECT_EQ(DITTO_UNWRAP_OR_ELSE(result, else_functor), 1);
 }
