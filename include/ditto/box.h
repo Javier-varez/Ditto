@@ -7,16 +7,23 @@ namespace Ditto {
 template <class T>
 class Box {
  public:
-  Box() noexcept = default;
-  explicit Box(T* pointer) noexcept : m_contents(pointer) {}
+  template <class... Args>
+  explicit Box(Args... args) noexcept {
+    m_contents = new T{std::forward<Args>(args)...};
+  }
 
-  Box(Box&& other) noexcept { *this = std::move(other); }
+  // Moving requires being able to default construct a T
+  Box(Box&& other) noexcept {
+    m_contents = other.m_contents;
+    other.m_contents = new T{};
+  }
 
+  // Moving requires being able to default construct a T
   auto operator=(Box&& other) noexcept -> Box& {
     if (this != &other) {
-      reset();
+      delete m_contents;
       m_contents = other.m_contents;
-      other.m_contents = nullptr;
+      other.m_contents = new T{};
     }
     return *this;
   }
@@ -24,9 +31,12 @@ class Box {
   Box(const Box& box) = delete;
   auto operator=(const Box& box) -> Box& = delete;
 
-  ~Box() { reset(); }
-
-  explicit operator bool() const noexcept { return m_contents != nullptr; }
+  ~Box() {
+    if (m_contents != nullptr) {
+      delete m_contents;
+      m_contents = nullptr;
+    }
+  }
 
   // Operators that access the internal pointer should not be called on a
   // temporary, as the pointer is immediately released.
@@ -37,22 +47,17 @@ class Box {
   [[nodiscard]] auto operator*() const& noexcept -> T& { return *m_contents; }
   [[nodiscard]] auto get() const& noexcept -> T* { return m_contents; }
 
-  // Calling reset on a temporary does not make sense, it will be destroyed
-  // anyways.
-  auto reset() noexcept {
-    if (m_contents != nullptr) {
-      delete m_contents;
-      m_contents = nullptr;
-    }
+  // Sometimes we may want to leak memory intentionally. In this case we could
+  // call this function to release ownership of the Box and return a bare
+  // pointer to it. Afterwards, the Box is default initialized with a new T.
+  auto leak() -> T* {
+    auto leaked_ptr = m_contents;
+    m_contents = new T{};
+    return leaked_ptr;
   }
 
  private:
   T* m_contents = nullptr;
 };
-
-template <class T, class... Args>
-inline auto make_box(Args... args) -> Box<T> {
-  return Box<T>{new T{std::forward<Args>(args)...}};
-}
 
 }  // namespace Ditto
