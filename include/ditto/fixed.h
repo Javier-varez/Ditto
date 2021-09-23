@@ -1,12 +1,9 @@
 
 #pragma once
 
-#include <algorithm>
 #include <cmath>
 #include <cstdint>
 #include <type_traits>
-
-#include "ditto/type_traits.h"
 
 namespace Ditto {
 
