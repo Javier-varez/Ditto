@@ -5,7 +5,7 @@ Generic reusable C++ software components for both embedded and general purpose s
 ## Available components
 
   * `Ditto::LinkedList`: Implementation of a doubly-linked list. Currently it is not very suitable for embedded use, it uses new/delete.
-  * `Ditto::Box`: Implementation of an owned pointer, similar to `std::unique_ptr`.
+  * `Ditto::Box`: Implementation of a non-null owned pointer, similar to `std::unique_ptr`, but is always valid. When moved, a new object is default constracted in the object that is being moved from.
   * `Ditto::Pair`: Pair implementation. Not much to be seen here.
   * `Ditto::HashMap`: Simple hash map implementation. It uses fixed size buckets and each contains a list to handle hash collisions. Much could be improved in this implementation. Especially to make it more suitable for embedded use. This is still WIP.
   * `Ditto::LinearMap`: More suitable map implementation for embedded systems. It is fully statically allocated and performs linear search for keys so lookup is O(N).
