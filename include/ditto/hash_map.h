@@ -10,7 +10,7 @@
 
 namespace Ditto {
 
-template <class K, class V, class HASH = Ditto::Hash>
+template <class K, class V>
 class HashMap {
  public:
   HashMap() = default;
@@ -22,12 +22,12 @@ class HashMap {
 
   auto operator[](const K& key) -> V& {
     auto node = search_or_reserve_slot(
-        m_elements[HASH::calculate(key) % m_capacity], key);
+        m_elements[Hash::calculate(key) % m_capacity], key);
     return node->right();
   }
 
   auto at(const K& key) const -> const V* {
-    const auto& list = m_elements[HASH::calculate(key) % m_capacity];
+    const auto& list = m_elements[Hash::calculate(key) % m_capacity];
     auto iter = search_slot(list, key);
     if (iter == list.cend()) {
       return nullptr;
@@ -36,7 +36,7 @@ class HashMap {
   }
 
   auto at(const K& key) -> V* {
-    auto& list = m_elements[HASH::calculate(key) % m_capacity];
+    auto& list = m_elements[Hash::calculate(key) % m_capacity];
     auto iter = search_slot(list, key);
     if (iter == list.cend()) {
       return nullptr;
@@ -45,7 +45,7 @@ class HashMap {
   }
 
   auto erase(const K& key) {
-    auto& list = m_elements[HASH::calculate(key) % m_capacity];
+    auto& list = m_elements[Hash::calculate(key) % m_capacity];
     auto iter = search_slot(list, key);
     if (iter != list.cend()) {
       list.erase(iter);
