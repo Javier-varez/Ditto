@@ -4,24 +4,20 @@
 
 namespace Ditto {
 
-class Hash {
- public:
-  // These are random hashing functions, I should invest some more time into
-  // improving them.
-  template <class K, std::enable_if_t<std::is_integral_v<K>, bool> = false>
-  static auto calculate(const K& key) -> std::size_t {
-    uint64_t hash = key;
-    hash ^= 0xDEADC0DE;
-    hash ^= key << 13;
-    hash += key >> 1;
-    hash += key << 22;
-    hash ^= key << 3;
-    hash ^= ~(key << 2);
-    hash += key << 8;
-    hash += key >> 20;
-    hash ^= key << 7;
-    return hash;
-  }
-};
+namespace Hash {
+
+template <class T>
+auto calculate(const T& key) -> std::size_t;
+
+auto calculate(std::uint64_t key) -> std::size_t;
+auto calculate(std::uint32_t key) -> std::size_t;
+auto calculate(std::uint16_t key) -> std::size_t;
+auto calculate(std::uint8_t key) -> std::size_t;
+auto calculate(std::int64_t key) -> std::size_t;
+auto calculate(std::int32_t key) -> std::size_t;
+auto calculate(std::int16_t key) -> std::size_t;
+auto calculate(std::int8_t key) -> std::size_t;
+
+};  // namespace Hash
 
 }  // namespace Ditto
