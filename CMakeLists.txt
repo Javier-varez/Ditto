@@ -1,21 +1,40 @@
 cmake_minimum_required(VERSION 3.14)
 project(Ditto)
 
+option(BUILD_DITTO_TESTS "Builds tests for the Ditto library" OFF)
+option(USE_STD_TEMPLATES "Uses containers from the STL instead of versions from Ditto if available" OFF)
+option(DITTO_TARGET_ARCH "Configures the target architecture" x86_64)
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS true)
+
+set(DITTO_SOURCES
+        src/assert.cpp
+        src/hash.cpp
+        src/crc32c.cpp
+        )
+
+if (DITTO_TARGET_ARCH MATCHES x86_64)
+    set(DITTO_SOURCES
+            ${DITTO_SOURCES}
+            src/arch/x86_64.cpp
+            )
+elseif (DITTO_TARGET_ARCH MATCHES aarch64)
+    set(DITTO_SOURCES
+            ${DITTO_SOURCES}
+            src/arch/aarch64.cpp
+            )
+endif ()
 
 add_library(
         Ditto
         STATIC
-        src/assert.cpp
-        src/hash.cpp
-        src/crc32c.cpp
+        ${DITTO_SOURCES}
 )
 target_include_directories(Ditto PUBLIC include)
 
 target_compile_features(Ditto PUBLIC cxx_std_20)
 
-option(BUILD_DITTO_TESTS "Builds tests for the Ditto library" OFF)
-option(USE_STD_TEMPLATES "Uses containers from the STL instead of versions from Ditto if available" OFF)
+target_compile_options(Ditto PUBLIC -fno-omit-frame-pointer)
 
 if (BUILD_DITTO_TESTS)
 
