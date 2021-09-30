@@ -18,7 +18,7 @@ jobs:
       with:
         cmakeListsOrSettingsJson: 'CMakeListsTxtAdvanced'
         cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
-        cmakeAppendedArgs: '-D BUILD_DITTO_TESTS=ON -D USE_STD_TEMPLATES=ON'
+        cmakeAppendedArgs: '-D BUILD_DITTO_TESTS=ON -D USE_STD_TEMPLATES=ON -DDITTO_TARGET_ARCH=x86_64'
         buildDirectory: '${{ github.workspace }}/build'
       env:
         CC: 'clang-12'
@@ -37,7 +37,7 @@ jobs:
       with:
         cmakeListsOrSettingsJson: 'CMakeListsTxtAdvanced'
         cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
-        cmakeAppendedArgs: '-D BUILD_DITTO_TESTS=ON'
+        cmakeAppendedArgs: '-DBUILD_DITTO_TESTS=ON -DDITTO_TARGET_ARCH=x86_64'
         buildDirectory: '${{ github.workspace }}/build'
       env:
         CC: 'clang-12'
