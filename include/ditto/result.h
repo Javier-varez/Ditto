@@ -12,7 +12,7 @@
 namespace Ditto {
 
 template <class Ok, class Err>
-class Result {
+class [[nodiscard]] Result {
  public:
   // Implicit construction from an object of type Ok
   Result(Ok val) {
@@ -46,22 +46,22 @@ class Result {
   [[nodiscard]] bool is_error() const { return !m_is_ok; }
   [[nodiscard]] bool is_ok() const { return m_is_ok; }
 
-  [[nodiscard]] Ok& ok_value() & {
+  [[nodiscard]] Ok& ok_value()& {
     DITTO_VERIFY(m_is_ok);
     return *reinterpret_cast<Ok*>(&m_memory_buffer);
   }
 
-  [[nodiscard]] Ok&& ok_value() && {
+  [[nodiscard]] Ok&& ok_value()&& {
     DITTO_VERIFY(m_is_ok);
     return std::move(*reinterpret_cast<Ok*>(&m_memory_buffer));
   }
 
-  [[nodiscard]] Err& error_value() & {
+  [[nodiscard]] Err& error_value()& {
     DITTO_VERIFY(!m_is_ok);
     return *reinterpret_cast<Err*>(&m_memory_buffer);
   }
 
-  [[nodiscard]] Err&& error_value() && {
+  [[nodiscard]] Err&& error_value()&& {
     DITTO_VERIFY(!m_is_ok);
     return std::move(*reinterpret_cast<Err*>(&m_memory_buffer));
   }
@@ -77,7 +77,7 @@ class Result {
   }
 
   Result(const Result&) = default;
-  Result(Result&&) = default;
+  Result(Result &&) = default;
   Result& operator=(const Result&) = default;
   Result& operator=(Result&&) = default;
 
@@ -95,7 +95,7 @@ class Result {
 };
 
 template <class Ok>
-class Result<Ok, void> {
+class [[nodiscard]] Result<Ok, void> {
  public:
   // Implicit construction from an object of type Ok
   Result(Ok val) {
@@ -116,12 +116,12 @@ class Result<Ok, void> {
   [[nodiscard]] bool is_error() const { return !m_is_ok; }
   [[nodiscard]] bool is_ok() const { return m_is_ok; }
 
-  [[nodiscard]] Ok& ok_value() & {
+  [[nodiscard]] Ok& ok_value()& {
     DITTO_VERIFY(m_is_ok);
     return *reinterpret_cast<Ok*>(&m_memory_buffer);
   }
 
-  [[nodiscard]] Ok&& ok_value() && {
+  [[nodiscard]] Ok&& ok_value()&& {
     DITTO_VERIFY(m_is_ok);
     return std::move(*reinterpret_cast<Ok*>(&m_memory_buffer));
   }
@@ -134,7 +134,7 @@ class Result<Ok, void> {
   }
 
   Result(const Result&) = default;
-  Result(Result&&) = default;
+  Result(Result &&) = default;
   Result& operator=(const Result&) = default;
   Result& operator=(Result&&) = default;
 
@@ -152,7 +152,7 @@ class Result<Ok, void> {
 };
 
 template <class Err>
-class Result<void, Err> {
+class [[nodiscard]] Result<void, Err> {
  public:
   // Implicit construction from an object of type Err
   Result(Err val) {
@@ -177,12 +177,12 @@ class Result<void, Err> {
   [[nodiscard]] bool is_error() const { return !m_is_ok; }
   [[nodiscard]] bool is_ok() const { return m_is_ok; }
 
-  [[nodiscard]] Err& error_value() & {
+  [[nodiscard]] Err& error_value()& {
     DITTO_VERIFY(!m_is_ok);
     return *reinterpret_cast<Err*>(&m_memory_buffer);
   }
 
-  [[nodiscard]] Err&& error_value() && {
+  [[nodiscard]] Err&& error_value()&& {
     DITTO_VERIFY(!m_is_ok);
     return std::move(*reinterpret_cast<Err*>(&m_memory_buffer));
   }
@@ -195,7 +195,7 @@ class Result<void, Err> {
   }
 
   Result(const Result&) = default;
-  Result(Result&&) = default;
+  Result(Result &&) = default;
   Result& operator=(const Result&) = default;
   Result& operator=(Result&&) = default;
 
