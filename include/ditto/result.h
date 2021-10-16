@@ -212,6 +212,18 @@ class [[nodiscard]] Result<void, Err> {
   Result() = default;
 };
 
+#define DITTO_VERIFY_OK(expression)          \
+  {                                          \
+    auto _evaluated_result = expression;     \
+    DITTO_VERIFY(_evaluated_result.is_ok()); \
+  }
+
+#define DITTO_VERIFY_ERR(expression)            \
+  {                                             \
+    auto _evaluated_result = expression;        \
+    DITTO_VERIFY(_evaluated_result.is_error()); \
+  }
+
 #define DITTO_PROPAGATE(expression)            \
   ({                                           \
     auto _result = expression;                 \

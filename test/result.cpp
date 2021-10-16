@@ -81,6 +81,34 @@ TEST(ResultTest, void_ok_enum_err) {
   Ditto::g_assert = nullptr;
 }
 
+TEST(ResultTest, verify_ok) {
+  StrictMock<Ditto::MockAssert> assert;
+  Ditto::g_assert = &assert;
+
+  auto returns_result = []() -> Result<void, uint32_t> {
+    return Result<void, uint32_t>::ok();
+  };
+  DITTO_VERIFY_OK(returns_result());
+
+  EXPECT_CALL(assert, assert_failed(_, _, _));
+  DITTO_VERIFY_ERR(returns_result());
+
+  Ditto::g_assert = nullptr;
+}
+
+TEST(ResultTest, verify_err) {
+  StrictMock<Ditto::MockAssert> assert;
+  Ditto::g_assert = &assert;
+
+  auto returns_result = []() -> Result<void, uint32_t> { return 123; };
+  DITTO_VERIFY_ERR(returns_result());
+
+  EXPECT_CALL(assert, assert_failed(_, _, _));
+  DITTO_VERIFY_OK(returns_result());
+
+  Ditto::g_assert = nullptr;
+}
+
 TEST(ResultTest, propagate_error) {
   auto divide_and_add = [](uint32_t numerator, uint32_t denominator,
                            uint32_t add) -> Result<double, const char*> {
