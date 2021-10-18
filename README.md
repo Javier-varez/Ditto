@@ -18,6 +18,7 @@ Generic reusable C++ software components for both embedded and general purpose s
   * `Ditto::Result`: Encapsulation of the return type of a function. Could either be and Ok value or an Error and has method to find out which one it is and obtain the value.
   * `Ditto::FixedPoint`: Implements a fixed point integer with support for common operations.
   * `Ditto::ResourceLock`: Implements a wrapper of an object and a mutex. The underlying object can only be accessed when the mutex has been locked, ensuring that the access to the resource is always mutually exclusive. It treats all accesses as potentially changing the state of the object, therefore one must also lock for reads even if no other thread is mutating the state of the underlying object.
+  * `Ditto::ReadWriteLock`: Implements a similar wrapper to a `ResourceLock`, but it can acquire many reader locks from any number of threads and be safe because they don't mutate the underlying value. A write lock requires exclusive access and therefore must guarantee that there are no other read or write locks. It makes it possible to lock multiple times in the same thread for reading.
   * It features a custom assert implementation that can be overriden by the user.
 
 
