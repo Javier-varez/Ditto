@@ -28,6 +28,13 @@ TEST(ResourceLockTest, can_lock_resource) {
   int_resource.lock([](auto& res) { EXPECT_EQ(res, 3); });
 }
 
+TEST(ResourceLockTest, can_return_value_from_closure) {
+  Ditto::ResourceLock<int, std::mutex> int_resource{123};
+
+  auto val = int_resource.lock([](auto& res) { return res; });
+  EXPECT_EQ(val, 123);
+}
+
 class MutexMock {
  public:
   MOCK_METHOD(void, lock, (), ());
@@ -92,4 +99,33 @@ TEST(ReadWriteLockTest, can_lock_resource_for_reading_twice) {
   int_resource.read_lock([&](const int& res) {
     int_resource.read_lock([](const int& res) { EXPECT_EQ(res, 123); });
   });
+}
+
+TEST(ResourceLockTest, can_return_value_from_read_closure) {
+  Ditto::ReadWriteLock<int, std::mutex> int_resource{123};
+
+  int val = int_resource.read_lock([](const auto& res) { return res; });
+  EXPECT_EQ(val, 123);
+}
+
+TEST(ResourceLockTest, can_return_value_from_write_closure) {
+  Ditto::ReadWriteLock<int, std::mutex> int_resource{123};
+
+  auto val = int_resource.write_lock([](auto& res) {
+    const auto prev = res;
+    res = 0;
+    return prev;
+  });
+
+  EXPECT_EQ(val, 123);
+}
+
+TEST(ResourceLockTest, moves_out_in_write_lock) {
+  Ditto::ReadWriteLock<std::unique_ptr<int>, std::mutex> int_resource{
+      std::make_unique<int>(123)};
+
+  std::unique_ptr<int> val =
+      int_resource.write_lock([](auto& res) { return std::move(res); });
+  EXPECT_TRUE(val);
+  EXPECT_EQ(*val, 123);
 }

@@ -4,6 +4,8 @@
 #include <mutex>
 #include <utility>
 
+#include "ditto/type_traits.h"
+
 namespace Ditto {
 
 template <class T, class M>
@@ -15,9 +17,9 @@ class ResourceLock {
 
   template <class Action,
             std::enable_if_t<std::is_invocable_v<Action, T&>, bool> = false>
-  inline void lock(Action action) {
+  inline auto lock(Action action) {
     std::scoped_lock<M> lock{m_mutex};
-    action(m_resource);
+    return action(m_resource);
   }
 
   // TODO(javier-varez): Handle copy and move constructors and assignment
@@ -42,14 +44,41 @@ class ReadWriteLock {
 
   template <class Action,
             std::enable_if_t<std::is_invocable_v<Action, T&>, bool> = false>
-  inline void write_lock(Action action) {
+  inline auto write_lock(Action action) {
     std::scoped_lock<M> lock{m_global_mutex};
-    action(m_resource);
+    return action(m_resource);
   }
 
-  template <
-      class Action,
-      std::enable_if_t<std::is_invocable_v<Action, const T&>, bool> = false>
+  template <class Action,
+            std::enable_if_t<std::is_invocable_v<Action, const T&> &&
+                                 !Ditto::returns_void_v<Action, const T&>,
+                             bool> = false>
+  inline auto read_lock(Action action) {
+    {
+      std::scoped_lock<M> r_lock{m_read_mutex};
+      m_num_readers++;
+      if (m_num_readers == 1) {
+        m_global_mutex.lock();
+      }
+    }
+
+    auto retval = action(static_cast<const T>(m_resource));
+
+    {
+      std::scoped_lock<M> r_lock{m_read_mutex};
+      m_num_readers--;
+      if (m_num_readers == 0) {
+        m_global_mutex.unlock();
+      }
+    }
+
+    return retval;
+  }
+
+  template <class Action,
+            std::enable_if_t<std::is_invocable_v<Action, const T&> &&
+                                 Ditto::returns_void_v<Action, const T&>,
+                             bool> = false>
   inline void read_lock(Action action) {
     {
       std::scoped_lock<M> r_lock{m_read_mutex};
