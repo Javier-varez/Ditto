@@ -70,7 +70,7 @@ class FixedPoint {
   template <class U, std::enable_if_t<std::is_integral_v<U>, bool> = false>
   constexpr inline auto operator+(U value) -> add_result<U> {
     return add_result<U>{add_underlying<U>{m_underlying} +
-                         (add_underlying<U>{value} << FRAC)};
+                         (static_cast<add_underlying<U>>(value) << FRAC)};
   }
 
   constexpr inline auto operator+=(FixedPoint other) -> FixedPoint& {
@@ -90,7 +90,7 @@ class FixedPoint {
   template <class U, std::enable_if_t<std::is_integral_v<U>, bool> = false>
   constexpr inline auto operator-(U value) -> sub_result<U> {
     return sub_result<U>{sub_underlying<U>{m_underlying} -
-                         (sub_underlying<U>{value} << FRAC)};
+                         (static_cast<sub_underlying<U>>(value) << FRAC)};
   }
 
   constexpr inline auto operator-=(FixedPoint other) -> FixedPoint& {
@@ -106,8 +106,8 @@ class FixedPoint {
   template <class U, std::uint32_t OTHER_FRAC>
   constexpr inline auto operator*(FixedPoint<U, OTHER_FRAC> other)
       -> mul_result<U, OTHER_FRAC> {
-    return mul_result<U, OTHER_FRAC>{mul_underlying<U>{m_underlying} *
-                                     other.m_underlying};
+    return mul_result<U, OTHER_FRAC>{
+        static_cast<mul_underlying<U>>(m_underlying) * other.m_underlying};
   }
 
   template <class U, std::enable_if_t<std::is_integral_v<U>, bool> = false>
@@ -220,10 +220,10 @@ class FixedPoint {
   [[nodiscard]] constexpr inline auto as_raw() const -> T {
     return m_underlying;
   }
-  [[nodiscard]] constexpr inline auto as_integer() -> T {
+  [[nodiscard]] constexpr inline auto as_integer() const -> T {
     return m_underlying >> FRAC;
   }
-  [[nodiscard]] constexpr inline auto as_double() -> double {
+  [[nodiscard]] constexpr inline auto as_double() const -> double {
     return static_cast<double>(m_underlying) / powl(2, FRAC);
   }
 
@@ -251,6 +251,30 @@ using FP32 = FixedPoint<std::uint32_t, FRAC>;
 
 template <std::uint32_t FRAC>
 using FP64 = FixedPoint<std::uint64_t, FRAC>;
+
+template <class T, uint32_t FRAC, class U>
+constexpr inline auto operator+(U val, FixedPoint<T, FRAC> fp)
+    -> FixedPoint<T, FRAC> {
+  return fp + val;
+}
+
+template <class T, uint32_t FRAC, class U>
+constexpr inline auto operator-(U val, FixedPoint<T, FRAC> fp)
+    -> FixedPoint<T, FRAC> {
+  return fp - val;
+}
+
+template <class T, uint32_t FRAC, class U>
+constexpr inline auto operator*(U val, FixedPoint<T, FRAC> fp)
+    -> FixedPoint<T, FRAC> {
+  return fp * val;
+}
+
+template <class T, uint32_t FRAC, class U>
+constexpr inline auto operator/(U val, FixedPoint<T, FRAC> fp)
+    -> FixedPoint<T, FRAC> {
+  return fp / val;
+}
 
 namespace numeric_literals {
 
