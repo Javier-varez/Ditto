@@ -143,3 +143,27 @@ TEST(FixedPointTest, round) {
   EXPECT_EQ(val.round().as_integer(), 11);
   EXPECT_EQ(val.as_integer(), 10);
 }
+
+TEST(FixedPointTest, add_oposite_order) {
+  FP32<12> number = FP32<12>::from_floating_point(123.0);
+  const auto result = 123 + number;
+  EXPECT_EQ(result.as_integer(), 246);
+}
+
+TEST(FixedPointTest, sub_oposite_order) {
+  FP32<12> number = FP32<12>::from_floating_point(123.0);
+  const auto result = 123 - number;
+  EXPECT_EQ(result.as_integer(), 0);
+}
+
+TEST(FixedPointTest, mul_oposite_order) {
+  FP32<12> number = FP32<12>::from_floating_point(123.0);
+  const auto result = 2 * number;
+  EXPECT_EQ(result.as_integer(), 246);
+}
+
+TEST(FixedPointTest, div_oposite_order) {
+  FP32<12> number = FP32<12>::from_floating_point(123.0);
+  const auto result = 123 / number;
+  EXPECT_EQ(result.as_integer(), 1);
+}
