@@ -19,10 +19,7 @@ class FixedPoint {
     return FixedPoint{static_cast<T>(value * double{1ULL << FRAC})};
   }
 
-  template <class U,
-            std::enable_if_t<std::is_integral_v<U> && std::is_unsigned_v<U>,
-                             bool> = false>
-  constexpr static auto from_integer(U value) -> FixedPoint {
+  constexpr static auto from_integer(T value) -> FixedPoint {
     return FixedPoint{value << FRAC};
   }
 
@@ -46,15 +43,19 @@ class FixedPoint {
   using primitive_type = T;
   constexpr static inline std::uint32_t fraction_bits = FRAC;
 
-  using add_underlying = std::make_unsigned_t<decltype(T{} + T{})>;
-  using sub_underlying = std::make_unsigned_t<decltype(T{} - T{})>;
+  template <class U>
+  using add_underlying = std::make_unsigned_t<decltype(T{} + U{})>;
+  template <class U>
+  using sub_underlying = std::make_unsigned_t<decltype(T{} - U{})>;
   template <class U>
   using mul_underlying = std::make_unsigned_t<decltype(T{} * U{})>;
   template <class U>
   using div_underlying = std::make_unsigned_t<decltype(T{} / U{})>;
 
-  using add_result = FixedPoint<add_underlying, FRAC>;
-  using sub_result = FixedPoint<sub_underlying, FRAC>;
+  template <class U>
+  using add_result = FixedPoint<add_underlying<U>, FRAC>;
+  template <class U>
+  using sub_result = FixedPoint<sub_underlying<U>, FRAC>;
   template <class U, std::uint32_t OTHER_FRAC>
   using mul_result = FixedPoint<mul_underlying<U>, FRAC + OTHER_FRAC>;
   template <class U, std::uint32_t OTHER_FRAC>
@@ -62,13 +63,14 @@ class FixedPoint {
 
   // Operators
 
-  constexpr inline auto operator+(FixedPoint other) -> add_result {
-    return add_result{add_underlying{m_underlying} + other.m_underlying};
+  constexpr inline auto operator+(FixedPoint other) -> add_result<T> {
+    return add_result<T>{add_underlying<T>{m_underlying} + other.m_underlying};
   }
 
   template <class U, std::enable_if_t<std::is_integral_v<U>, bool> = false>
-  constexpr inline auto operator+(U value) -> add_result {
-    return add_result{add_underlying{m_underlying} + (value << FRAC)};
+  constexpr inline auto operator+(U value) -> add_result<U> {
+    return add_result<U>{add_underlying<U>{m_underlying} +
+                         (add_underlying<U>{value} << FRAC)};
   }
 
   constexpr inline auto operator+=(FixedPoint other) -> FixedPoint& {
@@ -76,19 +78,19 @@ class FixedPoint {
     return *this;
   }
 
-  template <class U, std::enable_if_t<std::is_integral_v<U>, bool> = false>
-  constexpr inline auto operator+=(U value) -> FixedPoint& {
+  constexpr inline auto operator+=(T value) -> FixedPoint& {
     m_underlying += value << FRAC;
     return *this;
   }
 
-  constexpr inline auto operator-(FixedPoint other) -> sub_result {
-    return sub_result{sub_underlying{m_underlying} - other.m_underlying};
+  constexpr inline auto operator-(FixedPoint other) -> sub_result<T> {
+    return sub_result<T>{sub_underlying<T>{m_underlying} - other.m_underlying};
   }
 
   template <class U, std::enable_if_t<std::is_integral_v<U>, bool> = false>
-  constexpr inline auto operator-(U value) -> sub_result {
-    return sub_result{sub_underlying{m_underlying} - (value << FRAC)};
+  constexpr inline auto operator-(U value) -> sub_result<U> {
+    return sub_result<U>{sub_underlying<U>{m_underlying} -
+                         (sub_underlying<U>{value} << FRAC)};
   }
 
   constexpr inline auto operator-=(FixedPoint other) -> FixedPoint& {
@@ -96,8 +98,7 @@ class FixedPoint {
     return *this;
   }
 
-  template <class U, std::enable_if_t<std::is_integral_v<U>, bool> = false>
-  constexpr inline auto operator-=(U value) -> FixedPoint& {
+  constexpr inline auto operator-=(T value) -> FixedPoint& {
     m_underlying -= value << FRAC;
     return *this;
   }
@@ -111,7 +112,7 @@ class FixedPoint {
 
   template <class U, std::enable_if_t<std::is_integral_v<U>, bool> = false>
   constexpr inline auto operator*(U value) -> mul_result<U, 0> {
-    return mul_result<U, 0>{mul_underlying<U>{m_underlying} * value};
+    return mul_result<U, 0>{m_underlying * value};
   }
 
   template <class U, std::uint32_t OTHER_FRAC>
@@ -131,13 +132,12 @@ class FixedPoint {
   template <class U, std::uint32_t OTHER_FRAC>
   constexpr inline auto operator/(FixedPoint<U, OTHER_FRAC> other)
       -> div_result<U, OTHER_FRAC> {
-    return div_result<U, OTHER_FRAC>{div_underlying<U>{m_underlying} /
-                                     other.m_underlying};
+    return div_result<U, OTHER_FRAC>{m_underlying / other.m_underlying};
   }
 
   template <class U, std::enable_if_t<std::is_integral_v<U>, bool> = false>
   constexpr inline auto operator/(U value) -> div_result<U, 0> {
-    return div_result<U, 0>{div_underlying<U>{m_underlying} / value};
+    return div_result<U, 0>{m_underlying / value};
   }
 
   template <class U, std::uint32_t OTHER_FRAC>
@@ -208,6 +208,12 @@ class FixedPoint {
   template <class U, std::enable_if_t<std::is_integral_v<U>, bool> = false>
   constexpr inline auto operator<(U value) -> bool {
     return m_underlying < (static_cast<uint64_t>(value) << FRAC);
+  }
+
+  [[nodiscard]] constexpr inline auto round() const -> FixedPoint {
+    constexpr T half_unit = T{1} << (FRAC - 1);
+    constexpr T INT_MASK = ~((T{1} << FRAC) - 1);
+    return FixedPoint{(m_underlying + half_unit) & INT_MASK};
   }
 
   // Accessors and conversions
