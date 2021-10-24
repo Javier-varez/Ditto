@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "ditto/assert.h"
 
 namespace Ditto {
@@ -12,6 +14,14 @@ template <class T>
 class NonNullPtr final {
  public:
   NonNullPtr(T* _Nonnull ptr) : m_ptr(ptr) { DITTO_VERIFY(m_ptr != nullptr); }
+
+  NonNullPtr(const std::unique_ptr<T>& ptr) : m_ptr(ptr.get()) {
+    DITTO_VERIFY(m_ptr != nullptr);
+  }
+
+  NonNullPtr(const std::shared_ptr<T>& ptr) : m_ptr(ptr.get()) {
+    DITTO_VERIFY(m_ptr != nullptr);
+  }
 
   NonNullPtr(const NonNullPtr&) = default;
   NonNullPtr(NonNullPtr&&) = default;
