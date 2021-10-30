@@ -50,6 +50,7 @@ add_executable(
   test/badge.cpp
   test/fixed.cpp
   test/resource_lock.cpp
+  test/optional.cpp
 )
 
 target_include_directories(DittoTests PRIVATE test)
