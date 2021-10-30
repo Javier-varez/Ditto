@@ -4,6 +4,7 @@
 #if defined(USE_STD_TEMPLATES) && defined(__has_include) && \
     __has_include(<optional>) && defined(__cplusplus) && __cplusplus >= 201703L
 #include <optional>
+#include <utility>
 
 namespace Ditto {
 using std::make_optional;
