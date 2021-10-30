@@ -1,7 +1,10 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include <mutex>
+#include <type_traits>
 #include <utility>
 
 #include "ditto/type_traits.h"

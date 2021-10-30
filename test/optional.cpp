@@ -1,8 +1,9 @@
 
 #include "ditto/optional.h"
 
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
+
+#include <string>
 
 TEST(OptionalTest, default_constructor) { Ditto::optional<int> optional; }
 
