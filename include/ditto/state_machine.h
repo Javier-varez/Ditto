@@ -1,9 +1,7 @@
-
 #pragma once
 
-#include <span>
-
 #include "ditto/polymorphic_object.h"
+#include "ditto/span.h"
 
 namespace Ditto {
 
@@ -38,7 +36,7 @@ class StateMachine {
     }
   };
 
-  StateMachine(std::span<const StateTransition> state_transition_table,
+  StateMachine(Ditto::span<const StateTransition> state_transition_table,
                const StateFactory* state_factory)
       : m_state_transition_table(state_transition_table),
         m_state_factory(*state_factory) {
@@ -59,7 +57,7 @@ class StateMachine {
   }
 
  private:
-  std::span<const StateTransition> m_state_transition_table;
+  Ditto::span<const StateTransition> m_state_transition_table;
   const StateFactory& m_state_factory;
   StateId m_state_id = static_cast<StateId>(0);
   PolymorphicState m_state;
