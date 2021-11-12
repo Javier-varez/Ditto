@@ -51,6 +51,7 @@ add_executable(
   test/fixed.cpp
   test/resource_lock.cpp
   test/optional.cpp
+  test/span.cpp
 )
 
 target_include_directories(DittoTests PRIVATE test)
