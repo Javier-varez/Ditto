@@ -153,3 +153,41 @@ TEST(SpanTest, getSubspanFromLast) {
 
   EXPECT_EQ(last[0], 8);
 }
+
+TEST(SpanTest, iterator) {
+  std::array<uint32_t, 10> data{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+  Ditto::span my_span{data};
+
+  uint8_t expected_val = 0;
+  for (Ditto::span<uint32_t>::iterator iter = my_span.begin();
+       iter != my_span.end(); iter++) {
+    EXPECT_EQ(*iter, expected_val);
+    expected_val++;
+  }
+  EXPECT_EQ(expected_val, 10);
+}
+
+TEST(SpanTest, reverseIterator) {
+  std::array<uint32_t, 10> data{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+  Ditto::span my_span{data};
+
+  uint32_t expected_val = 9;
+  for (Ditto::span<uint32_t>::reverse_iterator iter = my_span.rbegin();
+       iter != my_span.rend(); iter++) {
+    EXPECT_EQ(*iter, expected_val);
+    expected_val--;
+  }
+  EXPECT_EQ(expected_val, 0xFFFFFFFFU);
+}
+
+TEST(SpanTest, iteratorForEach) {
+  std::array<uint32_t, 10> data{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+  Ditto::span my_span{data};
+
+  uint8_t expected_val = 0;
+  for (const auto& val : my_span) {
+    EXPECT_EQ(val, expected_val);
+    expected_val++;
+  }
+  EXPECT_EQ(expected_val, 10);
+}
