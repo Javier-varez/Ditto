@@ -7,7 +7,30 @@ on:
     branches: [ main ]
 
 jobs:
-  tests:
+  tests_with_std_containers:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Build with CMake
+      uses: lukka/run-cmake@v3
+      with:
+        cmakeListsOrSettingsJson: 'CMakeListsTxtAdvanced'
+        cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
+        cmakeAppendedArgs: '-D BUILD_DITTO_TESTS=ON -D USE_STD_TEMPLATES=ON'
+        buildDirectory: '${{ github.workspace }}/build'
+      env:
+        CC: ${{ matrix.os == 'ubuntu-latest' && 'clang-12' || 'clang' }}
+        CXX: ${{ matrix.os == 'ubuntu-latest' && 'clang++-12' || 'clang++' }}
+    - name: Execute tests
+      run: '${{ github.workspace }}/build/DittoTests'
+
+  tests_without_std_containers:
     runs-on: ${{ matrix.os }}
 
     strategy:

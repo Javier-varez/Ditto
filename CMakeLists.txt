@@ -14,6 +14,7 @@ target_include_directories(Ditto PUBLIC include)
 target_compile_features(Ditto PUBLIC cxx_std_20)
 
 option(BUILD_DITTO_TESTS "Builds tests for the Ditto library" OFF)
+option(USE_STD_TEMPLATES "Uses containers from the STL instead of versions from Ditto if available" OFF)
 
 if(BUILD_DITTO_TESTS)
 
@@ -30,6 +31,13 @@ set(DITTO_BUILD_OPTIONS
   -g3
   -Os
 )
+
+if(USE_STD_TEMPLATES)
+set(DITTO_BUILD_OPTIONS
+  ${DITTO_BUILD_OPTIONS}
+  -DUSE_STD_TEMPLATES=
+)
+endif()
 
 enable_testing()
 
