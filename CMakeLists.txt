@@ -60,6 +60,7 @@ add_executable(
   test/resource_lock.cpp
   test/optional.cpp
   test/span.cpp
+  test/binary_search_tree.cpp
 )
 
 target_include_directories(DittoTests PRIVATE test)
