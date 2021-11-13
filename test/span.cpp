@@ -159,8 +159,7 @@ TEST(SpanTest, iterator) {
   Ditto::span my_span{data};
 
   uint8_t expected_val = 0;
-  for (Ditto::span<uint32_t>::iterator iter = my_span.begin();
-       iter != my_span.end(); iter++) {
+  for (auto iter = my_span.begin(); iter != my_span.end(); iter++) {
     EXPECT_EQ(*iter, expected_val);
     expected_val++;
   }
@@ -172,8 +171,7 @@ TEST(SpanTest, reverseIterator) {
   Ditto::span my_span{data};
 
   uint32_t expected_val = 9;
-  for (Ditto::span<uint32_t>::reverse_iterator iter = my_span.rbegin();
-       iter != my_span.rend(); iter++) {
+  for (auto iter = my_span.rbegin(); iter != my_span.rend(); iter++) {
     EXPECT_EQ(*iter, expected_val);
     expected_val--;
   }
