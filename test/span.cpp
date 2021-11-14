@@ -1,7 +1,8 @@
 #include "ditto/span.h"
 
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
+
+#include <cstdint>
 
 TEST(SpanTest, constructorFromPointerAndLength) {
   constexpr uint32_t DATA_LEN = 10;
