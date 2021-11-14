@@ -13,6 +13,9 @@ using std::span;
 
 #include <array>
 #include <cstdio>
+#include <iosfwd>
+#include <iterator>
+#include <type_traits>
 #include <vector>
 
 #include "ditto/assert.h"

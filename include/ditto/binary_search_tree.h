@@ -1,6 +1,10 @@
 #pragma once
 
+#include <stdint.h>
+
+#include <algorithm>
 #include <memory>
+#include <utility>
 
 #include "ditto/non_null_ptr.h"
 #include "ditto/optional.h"
@@ -14,6 +18,8 @@ class BinarySearchTree {
   auto lookup(const K& key) -> Ditto::optional<Ditto::NonNullPtr<V>>;
 
   auto erase(const K& key) -> Ditto::optional<V>;
+
+  auto depth() const -> std::uint32_t;
 
  private:
   struct Node {
@@ -29,6 +35,8 @@ class BinarySearchTree {
 
   static void insert_node(Ditto::NonNullPtr<std::unique_ptr<Node>> root,
                           std::unique_ptr<Node> new_node);
+  static auto depth_from_node(Node* node, std::uint32_t current_depth)
+      -> std::uint32_t;
 };
 
 template <class K, class V>
@@ -118,6 +126,36 @@ void BinarySearchTree<K, V>::insert_node(
   }
 
   *node_double_ptr = std::move(new_node);
+}
+
+template <class K, class V>
+auto BinarySearchTree<K, V>::depth_from_node(Node* node, uint32_t current_depth)
+    -> std::uint32_t {
+  uint32_t depth = current_depth;
+
+  if (node) {
+    depth++;
+
+    if (node->left && node->right) {
+      return std::max(depth_from_node(node->left.get(), depth),
+                      depth_from_node(node->right.get(), depth));
+    }
+
+    if (node->left) {
+      depth = depth_from_node(node->left.get(), depth);
+    }
+
+    if (node->right) {
+      depth = depth_from_node(node->right.get(), depth);
+    }
+  }
+
+  return depth;
+}
+
+template <class K, class V>
+auto BinarySearchTree<K, V>::depth() const -> std::uint32_t {
+  return depth_from_node(m_root.get(), 0);
 }
 
 }  // namespace Ditto

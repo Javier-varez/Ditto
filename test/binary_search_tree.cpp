@@ -87,3 +87,20 @@ TEST(BinarySearchTreeTest, Erase) {
   ASSERT_TRUE(look_result.has_value());
   EXPECT_EQ(*look_result.value(), 240);
 }
+
+TEST(BinarySearchTreeTest, DepthTest) {
+  Ditto::BinarySearchTree<int, int> tree;
+  // insert 1000 elements in ascending order
+  for (uint32_t i = 0; i < 1000; i++) {
+    tree.insert(i, i);
+  }
+
+  // The tree should be a linked list
+  EXPECT_EQ(tree.depth(), 1000);
+
+  for (uint32_t i = 0; i < 1000; i++) {
+    auto result = tree.lookup(i);
+    ASSERT_TRUE(result.has_value());
+    EXPECT_EQ(*result.value(), i);
+  }
+}

@@ -1,4 +1,3 @@
-
 #pragma once
 
 #if defined(USE_STD_TEMPLATES) && defined(__has_include) && \
@@ -15,6 +14,7 @@ using std::optional;
 
 #include <new>
 #include <type_traits>
+#include <utility>
 
 #include "ditto/assert.h"
 
