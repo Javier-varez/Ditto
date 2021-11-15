@@ -7,6 +7,7 @@
 #include <utility>
 
 #include "ditto/assert.h"
+#include "ditto/linked_list.h"
 #include "ditto/non_null_ptr.h"
 #include "ditto/optional.h"
 
@@ -21,6 +22,8 @@ class RedBlackTree {
   auto erase(const K& key) -> Ditto::optional<V>;
 
   auto depth() const -> std::uint32_t;
+
+  void print() const;
 
  private:
   enum class Color { RED = 0x00, BLACK = 0x01 };
@@ -67,14 +70,14 @@ class RedBlackTree {
   };
 
   struct Node {
-    PointerAndColor<Node> color;
+    PointerAndColor<Node> color_and_parent;
     K key;
     V value;
     std::unique_ptr<Node> left;
     std::unique_ptr<Node> right;
 
     Node(const K& key, const V& value, Node* parent)
-        : key(key), value(value), color(parent, Color::RED) {}
+        : key(key), value(value), color_and_parent(parent, Color::RED) {}
   };
 
   std::unique_ptr<Node> m_root;
@@ -132,21 +135,21 @@ inline auto RedBlackTree<K, V>::lookup(const K& key)
 
 template <class K, class V>
 void RedBlackTree<K, V>::fixup_insertion(Ditto::NonNullPtr<Node> node) {
-  auto parent = node->color.pointer();
+  auto parent = node->color_and_parent.pointer();
   if (parent == nullptr) {
     // This is the root, which should always be black
-    node->color.set_color(Color::BLACK);
-  } else if (parent->color.color() == Color::BLACK) {
+    node->color_and_parent.set_color(Color::BLACK);
+  } else if (parent->color_and_parent.color() == Color::BLACK) {
     // Already good, since parent is black!
     return;
   } else {
-    auto grandparent = parent->color.pointer();
+    auto grandparent = parent->color_and_parent.pointer();
     if (grandparent->left.get() == parent) {
       auto uncle = grandparent->right.get();
-      if (uncle && (uncle->color.color() == Color::RED)) {
-        uncle->color.swap_color();
-        parent->color.swap_color();
-        grandparent->color.swap_color();
+      if (uncle && (uncle->color_and_parent.color() == Color::RED)) {
+        uncle->color_and_parent.swap_color();
+        parent->color_and_parent.swap_color();
+        grandparent->color_and_parent.swap_color();
         fixup_insertion(grandparent);
       } else {
         // Parent is left and uncle is black
@@ -154,15 +157,17 @@ void RedBlackTree<K, V>::fixup_insertion(Ditto::NonNullPtr<Node> node) {
           rotate_left(parent);
         }
         rotate_right(grandparent);
-        grandparent->color.swap_color();
-        parent->color.swap_color();
+        Color parent_color = parent->color_and_parent.color();
+        Color grandparent_color = grandparent->color_and_parent.color();
+        grandparent->color_and_parent.set_color(parent_color);
+        parent->color_and_parent.set_color(grandparent_color);
       }
     } else {
       auto uncle = grandparent->left.get();
-      if (uncle && (uncle->color.color() == Color::RED)) {
-        uncle->color.swap_color();
-        parent->color.swap_color();
-        grandparent->color.swap_color();
+      if (uncle && (uncle->color_and_parent.color() == Color::RED)) {
+        uncle->color_and_parent.swap_color();
+        parent->color_and_parent.swap_color();
+        grandparent->color_and_parent.swap_color();
         fixup_insertion(grandparent);
       } else {
         // Parent is right and uncle is black
@@ -170,8 +175,10 @@ void RedBlackTree<K, V>::fixup_insertion(Ditto::NonNullPtr<Node> node) {
           rotate_right(parent);
         }
         rotate_left(grandparent);
-        grandparent->color.swap_color();
-        parent->color.swap_color();
+        Color parent_color = parent->color_and_parent.color();
+        Color grandparent_color = grandparent->color_and_parent.color();
+        grandparent->color_and_parent.set_color(parent_color);
+        parent->color_and_parent.set_color(grandparent_color);
       }
     }
   }
@@ -179,7 +186,7 @@ void RedBlackTree<K, V>::fixup_insertion(Ditto::NonNullPtr<Node> node) {
 
 template <class K, class V>
 void RedBlackTree<K, V>::rotate_right(Ditto::NonNullPtr<Node> node) {
-  auto parent = node->color.pointer();
+  auto parent = node->color_and_parent.pointer();
   std::unique_ptr<Node> new_node = std::move(node->left);
   std::unique_ptr<Node> prev_right = std::move(new_node->right);
 
@@ -192,21 +199,21 @@ void RedBlackTree<K, V>::rotate_right(Ditto::NonNullPtr<Node> node) {
     parent_ref = &parent->left;
   }
 
-  node->color.set_pointer(new_node.get());
+  node->color_and_parent.set_pointer(new_node.get());
   new_node->right = std::move(*parent_ref);
 
-  new_node->color.set_pointer(parent);
+  new_node->color_and_parent.set_pointer(parent);
   *parent_ref = std::move(new_node);
 
   node->left = std::move(prev_right);
   if (node->left) {
-    node->left->color.set_pointer(node.get());
+    node->left->color_and_parent.set_pointer(node.get());
   }
 }
 
 template <class K, class V>
 void RedBlackTree<K, V>::rotate_left(Ditto::NonNullPtr<Node> node) {
-  auto parent = node->color.pointer();
+  auto parent = node->color_and_parent.pointer();
   std::unique_ptr<Node> new_node = std::move(node->right);
   std::unique_ptr<Node> prev_left = std::move(new_node->left);
 
@@ -219,46 +226,93 @@ void RedBlackTree<K, V>::rotate_left(Ditto::NonNullPtr<Node> node) {
     parent_ref = &parent->left;
   }
 
-  node->color.set_pointer(new_node.get());
+  node->color_and_parent.set_pointer(new_node.get());
   new_node->left = std::move(*parent_ref);
 
-  new_node->color.set_pointer(parent);
+  new_node->color_and_parent.set_pointer(parent);
   *parent_ref = std::move(new_node);
 
   node->right = std::move(prev_left);
   if (node->right) {
-    node->right->color.set_pointer(node.get());
+    node->right->color_and_parent.set_pointer(node.get());
   }
 }
 
 template <class K, class V>
 auto RedBlackTree<K, V>::depth_from_node(Node* node, uint32_t current_depth)
     -> std::uint32_t {
-  uint32_t depth = current_depth;
+  if (!node) return current_depth;
 
-  if (node) {
-    depth++;
-
-    if (node->left && node->right) {
-      return std::max(depth_from_node(node->left.get(), depth),
-                      depth_from_node(node->right.get(), depth));
-    }
-
-    if (node->left) {
-      depth = depth_from_node(node->left.get(), depth);
-    }
-
-    if (node->right) {
-      depth = depth_from_node(node->right.get(), depth);
-    }
+  if (node->left && node->right) {
+    return std::max(depth_from_node(node->left.get(), current_depth + 1),
+                    depth_from_node(node->right.get(), current_depth + 1));
   }
 
-  return depth;
+  if (node->left) {
+    return depth_from_node(node->left.get(), current_depth + 1);
+  }
+
+  if (node->right) {
+    return depth_from_node(node->right.get(), current_depth + 1);
+  }
+
+  return current_depth + 1;
 }
 
 template <class K, class V>
 auto RedBlackTree<K, V>::depth() const -> std::uint32_t {
   return depth_from_node(m_root.get(), 0);
+}
+
+template <class K, class V>
+void RedBlackTree<K, V>::print() const {
+  if (!m_root) return;
+
+  std::uint32_t tree_depth = depth();
+
+  Ditto::LinkedList<Node*> nodes;
+  nodes.push_back(m_root.get());
+
+  uint32_t current_depth = 0;
+  uint32_t node_count = 0;
+  bool empty_level = true;
+
+  while (true) {
+    Node* node = nodes.front();
+    if (node == nullptr) {
+      printf("             ");
+      // dummy children (just to make sure the spacing is kept)
+      nodes.push_back(nullptr);
+      nodes.push_back(nullptr);
+    } else {
+      empty_level = false;  // the level is not empty, should scan next
+      const auto node_idx = (node_count + 1) % (1 << current_depth);
+      if (node->color_and_parent.color() == Color::RED) {
+        // Color RED
+        printf("\u001b[31m");
+      }
+      printf("%4d:%4d    \u001b[0m", node_idx, node->key);
+      // Push children to the list
+      nodes.push_back(node->left.get());
+      nodes.push_back(node->right.get());
+    }
+
+    node_count++;
+    const auto max_node_count_at_depth = 2 * (1 << current_depth) - 1;
+    if (node_count >= max_node_count_at_depth) {
+      // Go to next level
+      printf("\n");
+      current_depth++;
+      if (empty_level) {
+        // Done!
+        return;
+      }
+      empty_level = true;
+    }
+
+    nodes.pop_front();
+  }
+  printf("\n");
 }
 
 }  // namespace Ditto
