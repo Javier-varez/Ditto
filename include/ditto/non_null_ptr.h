@@ -1,5 +1,5 @@
-
-#pragma once
+#ifndef DITTO_NON_NULL_PTR_H_
+#define DITTO_NON_NULL_PTR_H_
 
 #include <memory>
 
@@ -39,3 +39,5 @@ class NonNullPtr final {
 };
 
 }  // namespace Ditto
+
+#endif  // DITTO_NON_NULL_PTR_H_

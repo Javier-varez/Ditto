@@ -1,5 +1,5 @@
-
-#pragma once
+#ifndef DITTO_LINEAR_MAP_H_
+#define DITTO_LINEAR_MAP_H_
 
 #include <cstddef>
 #include <cstdint>
@@ -129,3 +129,5 @@ class LinearMap {
 };
 
 }  // namespace Ditto
+
+#endif  // DITTO_LINEAR_MAP_H_

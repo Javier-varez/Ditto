@@ -1,5 +1,5 @@
-
-#pragma once
+#ifndef DITTO_FIXED_H_
+#define DITTO_FIXED_H_
 
 #include <cmath>
 #include <cstdint>
@@ -302,3 +302,5 @@ constexpr auto operator"" _uq16_16(long double val) -> FP32<16> {
 }  // namespace numeric_literals
 
 }  // namespace Ditto
+
+#endif  // DITTO_FIXED_H_

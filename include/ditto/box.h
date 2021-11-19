@@ -1,5 +1,5 @@
-
-#pragma once
+#ifndef DITTO_BOX_H_
+#define DITTO_BOX_H_
 
 #include <utility>
 
@@ -61,3 +61,5 @@ class Box {
 };
 
 }  // namespace Ditto
+
+#endif  // DITTO_BOX_H_

@@ -1,5 +1,5 @@
-
-#pragma once
+#ifndef DITTO_RESOURCE_LOCK_H_
+#define DITTO_RESOURCE_LOCK_H_
 
 #include <stdint.h>
 
@@ -118,3 +118,5 @@ class ReadWriteLock {
 };
 
 }  // namespace Ditto
+
+#endif  // DITTO_RESOURCE_LOCK_H_

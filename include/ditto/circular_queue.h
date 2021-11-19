@@ -1,5 +1,5 @@
-
-#pragma once
+#ifndef DITTO_CIRCULAR_QUEUE_H_
+#define DITTO_CIRCULAR_QUEUE_H_
 
 #include <array>
 #include <compare>  // IWYU pragma: keep
@@ -157,3 +157,5 @@ class CircularQueue {
 };
 
 }  // namespace Ditto
+
+#endif  // DITTO_CIRCULAR_QUEUE_H_

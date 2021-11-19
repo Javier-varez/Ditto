@@ -1,5 +1,5 @@
-
-#pragma once
+#ifndef DITTO_RESULT_H_
+#define DITTO_RESULT_H_
 
 #include <algorithm>
 #include <cstddef>
@@ -300,3 +300,5 @@ class [[nodiscard]] Result<void, Err> {
   })
 
 }  // namespace Ditto
+
+#endif  // DITTO_RESULT_H_

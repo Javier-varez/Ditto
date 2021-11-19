@@ -1,5 +1,5 @@
-
-#pragma once
+#ifndef DITTO_HASH_MAP_H_
+#define DITTO_HASH_MAP_H_
 
 #include <algorithm>
 #include <cstddef>
@@ -88,3 +88,5 @@ class HashMap {
 };
 
 }  // namespace Ditto
+
+#endif  // DITTO_HASH_MAP_H_

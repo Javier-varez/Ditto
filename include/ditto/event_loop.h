@@ -1,5 +1,5 @@
-
-#pragma once
+#ifndef DITTO_EVENT_LOOP_H_
+#define DITTO_EVENT_LOOP_H_
 
 #include <atomic>
 #include <cstddef>
@@ -70,3 +70,5 @@ class EventLoop {
 };
 
 }  // namespace Ditto
+
+#endif  // DITTO_EVENT_LOOP_H_

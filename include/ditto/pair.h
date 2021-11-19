@@ -1,5 +1,6 @@
-
-#pragma once
+#ifndef DITTO_PAIR_H_
+#define DITTO_PAIR_H_
+#define DITTO_PAIR_H_
 
 namespace Ditto {
 template <class L, class R>
@@ -21,3 +22,5 @@ class Pair {
 };
 
 }  // namespace Ditto
+
+#endif  // DITTO_PAIR_H_

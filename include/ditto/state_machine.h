@@ -1,4 +1,5 @@
-#pragma once
+#ifndef DITTO_STATE_MACHINE_H_
+#define DITTO_STATE_MACHINE_H_
 
 #include "ditto/polymorphic_object.h"
 #include "ditto/span.h"
@@ -74,3 +75,5 @@ class StateMachine {
 };
 
 }  // namespace Ditto
+
+#endif  // DITTO_STATE_MACHINE_H_
