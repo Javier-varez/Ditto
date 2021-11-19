@@ -1,4 +1,5 @@
-#pragma once
+#ifndef DITTO_SPAN_H_
+#define DITTO_SPAN_H_
 
 #if defined(USE_STD_TEMPLATES) && defined(__has_include) && \
     __has_include(<span>) && defined(__cplusplus) && __cplusplus >= 201703L
@@ -223,3 +224,5 @@ class span {
 }  // namespace Ditto
 
 #endif
+
+#endif  // DITTO_SPAN_H_

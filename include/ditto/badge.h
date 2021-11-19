@@ -1,5 +1,5 @@
-
-#pragma once
+#ifndef DITTO_BADGE_H_
+#define DITTO_BADGE_H_
 
 namespace Ditto {
 
@@ -11,3 +11,5 @@ class Badge {
 };
 
 }  // namespace Ditto
+
+#endif  // DITTO_BADGE_H_

@@ -1,3 +1,5 @@
+#ifndef DITTO_HASH_H_
+#define DITTO_HASH_H_
 
 #include <cstddef>
 #include <cstdint>
@@ -22,3 +24,5 @@ auto calculate(std::int8_t key) -> std::size_t;
 };  // namespace Hash
 
 }  // namespace Ditto
+
+#endif  // DITTO_HASH_H_

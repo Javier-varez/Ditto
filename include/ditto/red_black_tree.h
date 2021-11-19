@@ -1,4 +1,5 @@
-#pragma once
+#ifndef DITTO_RED_BLACK_TREE_H_
+#define DITTO_RED_BLACK_TREE_H_
 
 #include <stdint.h>
 
@@ -316,3 +317,5 @@ void RedBlackTree<K, V>::print() const {
 }
 
 }  // namespace Ditto
+
+#endif  // DITTO_RED_BLACK_TREE_H_

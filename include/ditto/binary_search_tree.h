@@ -1,4 +1,5 @@
-#pragma once
+#ifndef DITTO_BINARY_SEARCH_TREE_H_
+#define DITTO_BINARY_SEARCH_TREE_H_
 
 #include <stdint.h>
 
@@ -159,3 +160,5 @@ auto BinarySearchTree<K, V>::depth() const -> std::uint32_t {
 }
 
 }  // namespace Ditto
+
+#endif  // DITTO_BINARY_SEARCH_TREE_H_

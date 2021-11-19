@@ -1,5 +1,5 @@
-
-#pragma once
+#ifndef DITTO_POLYMORPHIC_OBJECT_H_
+#define DITTO_POLYMORPHIC_OBJECT_H_
 
 #include <algorithm>
 #include <cstring>
@@ -85,3 +85,5 @@ class PolymorphicObject {
 };
 
 }  // namespace Ditto
+
+#endif  // DITTO_POLYMORPHIC_OBJECT_H_

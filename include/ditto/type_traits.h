@@ -1,5 +1,5 @@
-
-#pragma once
+#ifndef DITTO_TYPE_TRAITS_H_
+#define DITTO_TYPE_TRAITS_H_
 
 #include <type_traits>
 
@@ -32,3 +32,5 @@ template <class Action, class... Args>
 inline constexpr bool returns_void_v = returns_void<Action, Args...>::value;
 
 }  // namespace Ditto
+
+#endif  // DITTO_TYPE_TRAITS_H_

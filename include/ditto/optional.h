@@ -1,4 +1,5 @@
-#pragma once
+#ifndef DITTO_OPTIONAL_H_
+#define DITTO_OPTIONAL_H_
 
 #if defined(USE_STD_TEMPLATES) && defined(__has_include) && \
     __has_include(<optional>) && defined(__cplusplus) && __cplusplus >= 201703L
@@ -172,3 +173,5 @@ class optional {
 }  // namespace Ditto
 
 #endif
+
+#endif  // DITTO_OPTIONAL_H_

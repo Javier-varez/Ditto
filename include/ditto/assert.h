@@ -1,5 +1,5 @@
-
-#pragma once
+#ifndef DITTO_ASSERT_H_
+#define DITTO_ASSERT_H_
 
 #define DITTO_STRINGIFY(s) #s
 
@@ -25,3 +25,5 @@ void unimplemented(const char* function, int line, const char* file);
 #define DITTO_UNIMPLEMENTED()
 
 #endif
+
+#endif  // DITTO_ASSERT_H_

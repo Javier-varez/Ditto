@@ -1,5 +1,5 @@
-
-#pragma once
+#ifndef DITTO_LINKED_LIST_H_
+#define DITTO_LINKED_LIST_H_
 
 #include <cstddef>
 #include <iterator>
@@ -310,3 +310,5 @@ class LinkedList {
 };
 
 }  // namespace Ditto
+
+#endif  // DITTO_LINKED_LIST_H_
