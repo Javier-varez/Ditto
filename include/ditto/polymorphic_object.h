@@ -63,16 +63,16 @@ class PolymorphicObject {
    * @brief Gets a pointer to the allocated object. It could be nullptr if no
    *        type has been constructed.
    */
-  Base* get() const { return m_ptr; }
+  [[nodiscard]] Base* get() const { return m_ptr; }
 
-  Base* operator->() const { return m_ptr; }
+  [[nodiscard]] Base* operator->() const { return m_ptr; }
 
-  Base& operator*() const { return *m_ptr; }
+  [[nodiscard]] Base& operator*() const { return *m_ptr; }
 
   /**
    * @brief Implicit conversion to boolean.
    */
-  operator bool() const { return m_ptr != nullptr; }
+  [[nodiscard]] operator bool() const { return m_ptr != nullptr; }
 
  private:
   constexpr static size_t ALIGNMENT = std::max({alignof(DerivedClasses)...});

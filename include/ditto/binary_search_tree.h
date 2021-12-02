@@ -20,7 +20,7 @@ class BinarySearchTree {
 
   auto erase(const K& key) -> Ditto::optional<V>;
 
-  auto depth() const -> std::uint32_t;
+  [[nodiscard]] auto depth() const -> std::uint32_t;
 
  private:
   struct Node {

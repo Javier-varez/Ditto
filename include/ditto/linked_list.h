@@ -76,19 +76,25 @@ class LinkedListIterator {
     return *this;
   }
 
-  auto operator*() -> T& { return m_current->m_element; }
-  auto operator*() const -> const T& { return m_current->m_element; }
+  [[nodiscard]] auto operator*() -> T& { return m_current->m_element; }
+  [[nodiscard]] auto operator*() const -> const T& {
+    return m_current->m_element;
+  }
 
-  auto operator->() -> T* { return &m_current->m_element; }
-  auto operator->() const -> const T* { return &m_current->m_element; }
+  [[nodiscard]] auto operator->() -> T* { return &m_current->m_element; }
+  [[nodiscard]] auto operator->() const -> const T* {
+    return &m_current->m_element;
+  }
 
   template <class U, bool REV>
-  auto operator==(LinkedListIterator<U, REV> other) const -> bool {
+  [[nodiscard]] auto operator==(LinkedListIterator<U, REV> other) const
+      -> bool {
     return m_current == other.m_current;
   }
 
   template <class U, bool REV>
-  auto operator!=(LinkedListIterator<U, REV> other) const -> bool {
+  [[nodiscard]] auto operator!=(LinkedListIterator<U, REV> other) const
+      -> bool {
     return m_current != other.m_current;
   }
 
@@ -138,39 +144,57 @@ class LinkedList {
 
   LinkedList() = default;
 
-  auto begin() -> iterator { return iterator{m_head.get()}; }
-  auto end() -> iterator { return iterator{nullptr}; }
-  auto begin() const -> const_iterator { return const_iterator{m_head.get()}; }
-  auto end() const -> const_iterator { return const_iterator{nullptr}; }
-  auto cbegin() const -> const_iterator { return const_iterator{m_head.get()}; }
-  auto cend() const -> const_iterator { return const_iterator{nullptr}; }
-
-  auto rbegin() -> reverse_iterator { return reverse_iterator{m_tail}; }
-  auto rend() -> reverse_iterator { return reverse_iterator{nullptr}; }
-  auto rbegin() const -> const_reverse_iterator {
-    return const_reverse_iterator{m_tail};
-  }
-  auto rend() const -> const_reverse_iterator {
-    return const_reverse_iterator{nullptr};
-  }
-  auto crbegin() const -> const_reverse_iterator {
-    return const_reverse_iterator{m_tail};
-  }
-  auto crend() const -> const_reverse_iterator {
-    return const_reverse_iterator{nullptr};
-  }
-
-  auto front() -> reference { return m_head->m_element; }
-  auto front() const -> const_reference { return m_head->m_element; }
-  auto back() -> reference { return m_tail->m_element; }
-  auto back() const -> const_reference { return m_tail->m_element; }
-
-  auto front_iter() -> iterator { return iterator{m_head.get()}; }
-  auto front_iter() const -> const_iterator {
+  [[nodiscard]] auto begin() -> iterator { return iterator{m_head.get()}; }
+  [[nodiscard]] auto end() -> iterator { return iterator{nullptr}; }
+  [[nodiscard]] auto begin() const -> const_iterator {
     return const_iterator{m_head.get()};
   }
-  auto back_iter() -> iterator { return iterator{m_tail}; }
-  auto back_iter() const -> const_iterator { return const_iterator{m_tail}; }
+  [[nodiscard]] auto end() const -> const_iterator {
+    return const_iterator{nullptr};
+  }
+  [[nodiscard]] auto cbegin() const -> const_iterator {
+    return const_iterator{m_head.get()};
+  }
+  [[nodiscard]] auto cend() const -> const_iterator {
+    return const_iterator{nullptr};
+  }
+
+  [[nodiscard]] auto rbegin() -> reverse_iterator {
+    return reverse_iterator{m_tail};
+  }
+  [[nodiscard]] auto rend() -> reverse_iterator {
+    return reverse_iterator{nullptr};
+  }
+  [[nodiscard]] auto rbegin() const -> const_reverse_iterator {
+    return const_reverse_iterator{m_tail};
+  }
+  [[nodiscard]] auto rend() const -> const_reverse_iterator {
+    return const_reverse_iterator{nullptr};
+  }
+  [[nodiscard]] auto crbegin() const -> const_reverse_iterator {
+    return const_reverse_iterator{m_tail};
+  }
+  [[nodiscard]] auto crend() const -> const_reverse_iterator {
+    return const_reverse_iterator{nullptr};
+  }
+
+  [[nodiscard]] auto front() -> reference { return m_head->m_element; }
+  [[nodiscard]] auto front() const -> const_reference {
+    return m_head->m_element;
+  }
+  [[nodiscard]] auto back() -> reference { return m_tail->m_element; }
+  [[nodiscard]] auto back() const -> const_reference {
+    return m_tail->m_element;
+  }
+
+  [[nodiscard]] auto front_iter() -> iterator { return iterator{m_head.get()}; }
+  [[nodiscard]] auto front_iter() const -> const_iterator {
+    return const_iterator{m_head.get()};
+  }
+  [[nodiscard]] auto back_iter() -> iterator { return iterator{m_tail}; }
+  [[nodiscard]] auto back_iter() const -> const_iterator {
+    return const_iterator{m_tail};
+  }
 
   [[nodiscard]] auto empty() const -> bool { return m_head == nullptr; }
   [[nodiscard]] auto size() const -> size_type { return m_size; }

@@ -50,7 +50,7 @@ class Box {
   // Sometimes we may want to leak memory intentionally. In this case we could
   // call this function to release ownership of the Box and return a bare
   // pointer to it. Afterwards, the Box is default initialized with a new T.
-  auto leak() -> T* {
+  [[nodiscard]] auto leak() -> T* {
     auto leaked_ptr = m_contents;
     m_contents = new T{};
     return leaked_ptr;
