@@ -65,17 +65,17 @@ class span_iterator {
     return prev;
   }
 
-  constexpr reference operator[](std::size_t index) const {
+  [[nodiscard]] constexpr reference operator[](std::size_t index) const {
     return m_ptr[index];
   }
 
-  constexpr difference_type operator-(span_iterator other) const {
+  [[nodiscard]] constexpr difference_type operator-(span_iterator other) const {
     return m_ptr - other.m_ptr;
   }
 
-  constexpr reference operator*() const { return *m_ptr; }
+  [[nodiscard]] constexpr reference operator*() const { return *m_ptr; }
 
-  constexpr pointer operator->() const { return m_ptr; }
+  [[nodiscard]] constexpr pointer operator->() const { return m_ptr; }
 
  private:
   T* m_ptr;
@@ -185,34 +185,41 @@ class span {
     return *this;
   }
 
-  constexpr pointer data() const { return m_ptr; }
+  [[nodiscard]] constexpr pointer data() const { return m_ptr; }
 
-  constexpr reference operator[](std::size_t index) const {
+  [[nodiscard]] constexpr reference operator[](std::size_t index) const {
     DITTO_VERIFY(index < m_length);
     return m_ptr[index];
   }
 
-  constexpr reference front() const { return m_ptr[0]; }
-  constexpr reference back() const { return m_ptr[m_length - 1]; }
+  [[nodiscard]] constexpr reference front() const { return m_ptr[0]; }
+  [[nodiscard]] constexpr reference back() const { return m_ptr[m_length - 1]; }
 
-  constexpr std::size_t size() const { return m_length; }
-  constexpr std::size_t size_bytes() const { return m_length * sizeof(T); }
-  constexpr bool empty() const { return m_length == 0; }
+  [[nodiscard]] constexpr std::size_t size() const { return m_length; }
+  [[nodiscard]] constexpr std::size_t size_bytes() const {
+    return m_length * sizeof(T);
+  }
+  [[nodiscard]] constexpr bool empty() const { return m_length == 0; }
 
-  constexpr span first(std::size_t count) const { return {m_ptr, count}; }
-  constexpr span last(std::size_t count) const {
+  [[nodiscard]] constexpr span first(std::size_t count) const {
+    return {m_ptr, count};
+  }
+  [[nodiscard]] constexpr span last(std::size_t count) const {
     return {m_ptr + m_length - count, count};
   }
-  constexpr span subspan(std::size_t offset, std::size_t count) const {
+  [[nodiscard]] constexpr span subspan(std::size_t offset,
+                                       std::size_t count) const {
     return {m_ptr + offset, count};
   }
 
-  constexpr iterator begin() const { return iterator{m_ptr}; }
-  constexpr iterator end() const { return iterator{&m_ptr[m_length]}; }
-  constexpr reverse_iterator rbegin() const {
+  [[nodiscard]] constexpr iterator begin() const { return iterator{m_ptr}; }
+  [[nodiscard]] constexpr iterator end() const {
+    return iterator{&m_ptr[m_length]};
+  }
+  [[nodiscard]] constexpr reverse_iterator rbegin() const {
     return std::make_reverse_iterator(end());
   }
-  constexpr reverse_iterator rend() const {
+  [[nodiscard]] constexpr reverse_iterator rend() const {
     return std::make_reverse_iterator(begin());
   }
 

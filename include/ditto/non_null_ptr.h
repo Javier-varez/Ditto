@@ -28,11 +28,11 @@ class NonNullPtr final {
   NonNullPtr& operator=(const NonNullPtr&) = default;
   NonNullPtr& operator=(NonNullPtr&&) = default;
 
-  T* _Nonnull get() const { return m_ptr; }
+  [[nodiscard]] T* _Nonnull get() const { return m_ptr; }
 
-  T* _Nonnull operator->() const { return m_ptr; }
+  [[nodiscard]] T* _Nonnull operator->() const { return m_ptr; }
 
-  T& operator*() const { return *m_ptr; }
+  [[nodiscard]] T& operator*() const { return *m_ptr; }
 
  private:
   T* _Nonnull m_ptr;

@@ -22,7 +22,7 @@ using std::optional;
 namespace Ditto {
 
 template <class T>
-class optional {
+class [[nodiscard]] optional {
  public:
   constexpr optional() noexcept : m_valid(false), m_dummy(false) {}
 
@@ -33,7 +33,7 @@ class optional {
       m_valid = true;
     }
   }
-  constexpr optional(optional&& other) noexcept
+  constexpr optional(optional && other) noexcept
       : m_valid(false), m_dummy(false) {
     if (other.has_value()) {
       m_member = T{std::move(other).value()};
@@ -51,7 +51,7 @@ class optional {
   }
 
   template <class U>
-  constexpr explicit optional(optional<U>&& other)
+  constexpr explicit optional(optional<U> && other)
       : m_valid(false), m_dummy(false) {
     if (other.has_value()) {
       m_valid = true;
@@ -64,7 +64,7 @@ class optional {
       : m_valid(true), m_member(std::forward<Args>(args)...) {}
 
   template <class U = T>
-  constexpr explicit optional(U&& value)
+  constexpr explicit optional(U && value)
       : m_valid(true), m_member(std::forward<U>(value)) {}
 
   constexpr optional& operator=(const optional& other) noexcept {
@@ -99,21 +99,21 @@ class optional {
     return *this;
   }
 
-  constexpr bool has_value() const noexcept { return m_valid; }
-  constexpr operator bool() const noexcept { return m_valid; }
+  [[nodiscard]] constexpr bool has_value() const noexcept { return m_valid; }
+  [[nodiscard]] constexpr operator bool() const noexcept { return m_valid; }
 
-  constexpr T value() const& noexcept {
+  [[nodiscard]] constexpr T value() const& noexcept {
     DITTO_VERIFY(m_valid);
     return m_member;
   }
 
-  constexpr T&& value() && noexcept {
+  [[nodiscard]] constexpr T&& value()&& noexcept {
     DITTO_VERIFY(m_valid);
     return std::move(m_member);
   }
 
   template <class U>
-  constexpr T value_or(U&& def) const& {
+  [[nodiscard]] constexpr T value_or(U && def) const& {
     if (m_valid) {
       return m_member;
     }
@@ -121,36 +121,40 @@ class optional {
   }
 
   template <class U>
-  constexpr T value_or(U&& def) && {
+  [[nodiscard]] constexpr T value_or(U && def)&& {
     if (m_valid) {
       return std::move(m_member);
     }
     return std::forward<U>(def);
   }
 
-  constexpr const T* operator->() const noexcept {
+  [[nodiscard]] constexpr const T* operator->() const noexcept {
     if (!m_valid) {
       return nullptr;
     }
     return &m_member;
   }
 
-  constexpr T* operator->() noexcept {
+  [[nodiscard]] constexpr T* operator->() noexcept {
     if (!m_valid) {
       return nullptr;
     }
     return &m_member;
   }
 
-  constexpr const T& operator*() const& noexcept { return m_member; }
+  [[nodiscard]] constexpr const T& operator*() const& noexcept {
+    return m_member;
+  }
 
-  constexpr T& operator*() & noexcept { return m_member; }
+  [[nodiscard]] constexpr T& operator*()& noexcept { return m_member; }
 
-  constexpr const T&& operator*() const&& noexcept {
+  [[nodiscard]] constexpr const T&& operator*() const&& noexcept {
     return std::move(m_member);
   }
 
-  constexpr T&& operator*() && noexcept { return std::move(m_member); }
+  [[nodiscard]] constexpr T&& operator*()&& noexcept {
+    return std::move(m_member);
+  }
 
   constexpr void reset() {
     if (has_value()) {

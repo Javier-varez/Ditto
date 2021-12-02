@@ -22,7 +22,7 @@ class RedBlackTree {
 
   auto erase(const K& key) -> Ditto::optional<V>;
 
-  auto depth() const -> std::uint32_t;
+  [[nodiscard]] auto depth() const -> std::uint32_t;
 
   void print() const;
 

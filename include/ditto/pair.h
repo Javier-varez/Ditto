@@ -1,6 +1,5 @@
 #ifndef DITTO_PAIR_H_
 #define DITTO_PAIR_H_
-#define DITTO_PAIR_H_
 
 namespace Ditto {
 template <class L, class R>
@@ -8,13 +7,13 @@ class Pair {
  public:
   Pair(const L& l, const R& r) : m_left(l), m_right(r) {}
 
-  auto left() const -> const L& { return m_left; }
+  [[nodiscard]] auto left() const -> const L& { return m_left; }
 
-  auto left() -> L& { return m_left; }
+  [[nodiscard]] auto left() -> L& { return m_left; }
 
-  auto right() const -> const R& { return m_right; }
+  [[nodiscard]] auto right() const -> const R& { return m_right; }
 
-  auto right() -> R& { return m_right; }
+  [[nodiscard]] auto right() -> R& { return m_right; }
 
  private:
   L m_left;
