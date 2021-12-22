@@ -3,3 +3,4 @@ std_build
 **/compile_commands.json
 **/.cache
 **/iwyu_report.txt
+**/.DS_Store
