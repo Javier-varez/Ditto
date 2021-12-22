@@ -62,6 +62,7 @@ add_executable(
   test/span.cpp
   test/binary_search_tree.cpp
   test/red_black_tree.cpp
+  test/enumerate.cpp
 )
 
 target_include_directories(DittoTests PRIVATE test)
