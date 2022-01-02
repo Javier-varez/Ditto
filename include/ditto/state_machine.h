@@ -1,8 +1,8 @@
 #ifndef DITTO_STATE_MACHINE_H_
 #define DITTO_STATE_MACHINE_H_
 
-#include "ditto/polymorphic_object.h"
 #include "ditto/span.h"
+#include "ditto/static_ptr.h"
 
 namespace Ditto {
 
@@ -26,7 +26,7 @@ class StateMachine {
   };
 
   using PolymorphicState =
-      Ditto::PolymorphicObject<State<StateId, EventId>, States...>;
+      Ditto::static_ptr<State<StateId, EventId>, States...>;
 
   class StateFactory {
    public:
