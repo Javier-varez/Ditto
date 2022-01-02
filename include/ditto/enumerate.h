@@ -3,6 +3,8 @@
 
 #include <iterator>
 
+namespace Ditto {
+
 template <class inner_iter>
 class EnumIterator {
  public:
@@ -96,5 +98,7 @@ template <class Container>
 auto make_enumerated_iter(Container& container) -> EnumContainer<Container> {
   return EnumContainer{container};
 }
+
+}  // namespace Ditto
 
 #endif  // DITTO_ENUMERATE_H_
