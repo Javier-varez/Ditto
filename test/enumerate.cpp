@@ -4,6 +4,8 @@
 
 #include <map>
 
+using Ditto::make_enumerated_iter;
+
 TEST(EnumerateTest, ItWorks) {
   std::vector<int> data{1, 2, 3, 4, 5};
 
