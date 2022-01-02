@@ -21,6 +21,7 @@ Generic reusable C++ software components for both embedded and general purpose s
   * `Ditto::ReadWriteLock`: Implements a similar wrapper to a `ResourceLock`, but it can acquire many reader locks from any number of threads and be safe because they don't mutate the underlying value. A write lock requires exclusive access and therefore must guarantee that there are no other read or write locks. It makes it possible to lock multiple times in the same thread for reading.
   * `Ditto::optional`: Implements the same abstraction as `std::optional` with the same API. Makes it available on targets where `std::optional` is not present. If `std::optional` is present, `Ditto::optional` is just an alias to `std::optional` (if `USE_STD_TEMPLATES` was defined).
   * `Ditto::span`: Implements the same abstraction as `std::span` with the same API. Makes it available on targets where `std::span` is not present. If `std::span` is present, `Ditto::span` is just an alias to `std::span` (if `USE_STD_TEMPLATES` was defined).
+  * `Ditto::make_enumerated_iter`: Makes an enumerated iterator when iterating ordered containers like std::vector, std::array or std::map. The enumerated iterator returns a tuple, being the first element the `size_t` index of the enumeration and the second element the element of the original iterator of the underlying type. This is useful when you want to iterate using begin and end but also get access to the indexes of the elements.
   * It features a custom assert implementation that can be overriden by the user.
 
 
