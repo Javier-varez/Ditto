@@ -1,12 +1,11 @@
-
-#include "ditto/polymorphic_object.h"
+#include "ditto/static_ptr.h"
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include <memory>
 
-using Ditto::PolymorphicObject;
+using Ditto::static_ptr;
 using testing::ElementsAreArray;
 
 class Base {
@@ -51,12 +50,12 @@ class Derived3 : public Base {
   const char* m_val = 0;
 };
 
-TEST(PolymorphicObjectTest, Constructor) {
-  PolymorphicObject<Base, Derived1, Derived2, Derived3> obj;
+TEST(StaticPtrTest, Constructor) {
+  static_ptr<Base, Derived1, Derived2, Derived3> obj;
 }
 
-TEST(PolymorphicObjectTest, Make) {
-  PolymorphicObject<Base, Derived1, Derived2, Derived3> obj;
+TEST(StaticPtrTest, Make) {
+  static_ptr<Base, Derived1, Derived2, Derived3> obj;
 
   obj.make<Derived1>(1);
   EXPECT_STREQ(obj->type(), "1");
@@ -77,8 +76,8 @@ TEST(PolymorphicObjectTest, Make) {
   EXPECT_EQ(dynamic_cast<Derived2*>(obj.get()), nullptr);
 }
 
-TEST(PolymorphicObjectTest, Reset) {
-  PolymorphicObject<Base, Derived3> obj;
+TEST(StaticPtrTest, Reset) {
+  static_ptr<Base, Derived3> obj;
 
   obj.make<Derived3>("");
   EXPECT_NE(obj.get(), nullptr);

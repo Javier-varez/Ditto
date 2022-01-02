@@ -1,5 +1,5 @@
-#ifndef DITTO_POLYMORPHIC_OBJECT_H_
-#define DITTO_POLYMORPHIC_OBJECT_H_
+#ifndef DITTO_STATIC_PTR_H
+#define DITTO_STATIC_PTR_H
 
 #include <algorithm>
 #include <cstring>
@@ -22,16 +22,16 @@ namespace Ditto {
  * block is enough to hold any of the derived class types.
  */
 template <class Base, class... DerivedClasses>
-class PolymorphicObject {
+class static_ptr {
  public:
-  PolymorphicObject() = default;
+  static_ptr() = default;
 
-  PolymorphicObject(PolymorphicObject&& other) = delete;
-  PolymorphicObject& operator=(PolymorphicObject&& other) = delete;
-  PolymorphicObject(const PolymorphicObject&) = delete;
-  PolymorphicObject& operator=(const PolymorphicObject&) = delete;
+  static_ptr(static_ptr&& other) = delete;
+  static_ptr& operator=(static_ptr&& other) = delete;
+  static_ptr(const static_ptr&) = delete;
+  static_ptr& operator=(const static_ptr&) = delete;
 
-  ~PolymorphicObject() { reset(); }
+  ~static_ptr() { reset(); }
 
   /**
    * @brief Constructs an object of the given type. The type must be one of
@@ -86,4 +86,4 @@ class PolymorphicObject {
 
 }  // namespace Ditto
 
-#endif  // DITTO_POLYMORPHIC_OBJECT_H_
+#endif  // DITTO_STATIC_PTR_H

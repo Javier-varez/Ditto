@@ -48,7 +48,7 @@ add_executable(
   test/hash_map.cpp
   test/linear_map.cpp
   test/box.cpp
-  test/polymorphic_object.cpp
+  test/static_ptr.cpp
   test/state_machine.cpp
   test/circular_queue.cpp
   test/non_null_ptr.cpp
