@@ -223,6 +223,20 @@ class span {
     return std::make_reverse_iterator(begin());
   }
 
+  // Splits a span in
+  // left: original [0, middle_index)
+  // right: original [middle_index, length)
+  std::pair<span, span> split_at(size_t middle_index) {
+    middle_index = std::min(m_length, middle_index);
+
+    span left{m_ptr, middle_index};
+    span right{m_ptr + middle_index, m_length - middle_index};
+    return std::make_pair(left, right);
+  }
+
+  // Splits a span in its two halves
+  std::pair<span, span> split_in_half() { return split_at(m_length / 2); }
+
  private:
   T* m_ptr;
   std::size_t m_length;
