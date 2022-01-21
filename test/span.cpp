@@ -190,3 +190,39 @@ TEST(SpanTest, iteratorForEach) {
   }
   EXPECT_EQ(expected_val, 10);
 }
+
+#if !defined(USE_STD_TEMPLATES) || !defined(__has_include) || \
+    !__has_include(<span>) || !defined(__cplusplus) || __cplusplus < 201703L
+
+TEST(SpanTest, SplitAt) {
+  std::array<uint32_t, 10> data{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+  Ditto::span my_span{data};
+
+  auto [left, right] = my_span.split_at(1);
+  ASSERT_EQ(left.size(), 1);
+  ASSERT_EQ(left.data(), &data[0]);
+
+  ASSERT_EQ(right.size(), 9);
+  ASSERT_EQ(right.data(), &data[1]);
+
+  auto [lefts, rights] = my_span.split_at(11);
+  ASSERT_EQ(lefts.size(), 10);
+  ASSERT_EQ(lefts.data(), &data[0]);
+
+  ASSERT_EQ(rights.size(), 0);
+  ASSERT_EQ(rights.data(), &data[10]);
+}
+
+TEST(SpanTest, SplitInHalf) {
+  std::array<uint32_t, 10> data{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+  Ditto::span my_span{data};
+
+  auto [left, right] = my_span.split_in_half();
+  ASSERT_EQ(left.size(), 5);
+  ASSERT_EQ(left.data(), &data[0]);
+
+  ASSERT_EQ(right.size(), 5);
+  ASSERT_EQ(right.data(), &data[5]);
+}
+
+#endif
