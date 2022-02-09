@@ -21,7 +21,7 @@ void unimplemented(const char* function, int line, const char* file);
 
 #else
 
-#define DITTO_VERIFY(x) (x)
+#define DITTO_VERIFY(x) ((void)(x))
 #define DITTO_UNIMPLEMENTED()
 
 #endif
