@@ -10,8 +10,8 @@
 
 namespace Ditto {
 
-template <class K, class V>
-class HashMap {
+template <class K, class V, class H = SimpleHasher>
+requires Hashable<H, K> class HashMap {
  public:
   HashMap() = default;
   explicit HashMap(std::size_t capacity)
@@ -20,14 +20,20 @@ class HashMap {
 
   ~HashMap() { delete[] m_elements; }
 
+  [[nodiscard]] static auto calculate_hash(const K& key) -> std::uint32_t {
+    H hasher;
+    hasher.hash(key);
+    return hasher.finish();
+  }
+
   [[nodiscard]] auto operator[](const K& key) -> V& {
     auto node = search_or_reserve_slot(
-        m_elements[Hash::calculate(key) % m_capacity], key);
+        m_elements[calculate_hash(key) % m_capacity], key);
     return node->right();
   }
 
   [[nodiscard]] auto at(const K& key) const -> const V* {
-    const auto& list = m_elements[Hash::calculate(key) % m_capacity];
+    const auto& list = m_elements[calculate_hash(key) % m_capacity];
     auto iter = search_slot(list, key);
     if (iter == list.cend()) {
       return nullptr;
@@ -36,7 +42,7 @@ class HashMap {
   }
 
   [[nodiscard]] auto at(const K& key) -> V* {
-    auto& list = m_elements[Hash::calculate(key) % m_capacity];
+    auto& list = m_elements[calculate_hash(key) % m_capacity];
     auto iter = search_slot(list, key);
     if (iter == list.cend()) {
       return nullptr;
@@ -45,7 +51,7 @@ class HashMap {
   }
 
   auto erase(const K& key) {
-    auto& list = m_elements[Hash::calculate(key) % m_capacity];
+    auto& list = m_elements[calculate_hash(key) % m_capacity];
     auto iter = search_slot(list, key);
     if (iter != list.cend()) {
       list.erase(iter);

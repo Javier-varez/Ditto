@@ -16,11 +16,6 @@ TEST(HashMapTest, TinyMap) {
   EXPECT_EQ(tiny_map[0], 123);
   EXPECT_EQ(tiny_map[1234567890], 234);
   EXPECT_EQ(tiny_map[1234567891], 345);
-
-  // The first two elements should collide.
-  EXPECT_EQ(Ditto::Hash::calculate(0) % 2, 1);
-  EXPECT_EQ(Ditto::Hash::calculate(1234567890) % 2, 1);
-  EXPECT_EQ(Ditto::Hash::calculate(1234567891) % 2, 0);
 }
 
 TEST(HashMapTest, LargeMap) {
