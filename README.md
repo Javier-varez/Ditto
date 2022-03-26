@@ -62,6 +62,8 @@ support.
     mutually exclusive (They won't be instantiated at the same time). An example for a use case is a 
     screen in a graphics system. When switching screens, all widgets in the previous screen will no 
     longer be used and therefore, all screens could be a `Ditto::static_ptr`.
+  * `Ditto::SimpleHasher`: Simple hasher implementation that leverages CRC32C as a hasher. It 
+    can hash an incoming stream of data and satisfies the Hasher concept.
   * It features a custom assert implementation that can be overriden by the user.
 
 

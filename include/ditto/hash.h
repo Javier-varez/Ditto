@@ -5,23 +5,58 @@
 #include <cstdint>
 #include <type_traits>
 
+#include "ditto/crc32c.h"
+
 namespace Ditto {
 
-namespace Hash {
-
 template <class T>
-auto calculate(const T& key) -> std::size_t;
+concept Hasher = requires(T hasher) {
+  // Must be default constructible
+  T{};
 
-auto calculate(std::uint64_t key) -> std::size_t;
-auto calculate(std::uint32_t key) -> std::size_t;
-auto calculate(std::uint16_t key) -> std::size_t;
-auto calculate(std::uint8_t key) -> std::size_t;
-auto calculate(std::int64_t key) -> std::size_t;
-auto calculate(std::int32_t key) -> std::size_t;
-auto calculate(std::int16_t key) -> std::size_t;
-auto calculate(std::int8_t key) -> std::size_t;
+  // Must have a finish method
+  std::uint32_t{hasher.finish()};
 
-};  // namespace Hash
+  // Must be able to hash common types
+  hasher.hash(std::int64_t{});
+  hasher.hash(std::uint64_t{});
+  hasher.hash(std::int32_t{});
+  hasher.hash(std::uint32_t{});
+  hasher.hash(std::int16_t{});
+  hasher.hash(std::uint16_t{});
+  hasher.hash(std::int8_t{});
+  hasher.hash(std::uint8_t{});
+};
+
+template <class H, class T>
+concept Hashable = requires(H hasher, T hashable) {
+  // H must be a hasher
+  requires Hasher<H>;
+
+  // The hasher must support the key
+  hasher.hash(hashable);
+};
+
+// CRC32 Hasher accepts common types
+class SimpleHasher {
+ public:
+  SimpleHasher() = default;
+
+  void hash(std::uint64_t value);
+  void hash(std::int64_t value);
+  void hash(std::uint32_t value);
+  void hash(std::int32_t value);
+  void hash(std::uint16_t value);
+  void hash(std::int16_t value);
+  void hash(std::uint8_t value);
+  void hash(std::int8_t value);
+  void hash(const char* value);
+
+  auto finish() -> std::uint32_t;
+
+ private:
+  Crc32cCalculator m_inner;
+};
 
 }  // namespace Ditto
 
