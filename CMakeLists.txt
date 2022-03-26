@@ -8,6 +8,7 @@ add_library(
   STATIC
   src/assert.cpp
   src/hash.cpp
+  src/crc32c.cpp
 )
 target_include_directories(Ditto PUBLIC include)
 
