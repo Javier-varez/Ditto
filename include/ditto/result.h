@@ -238,6 +238,7 @@ class [[nodiscard]] Result<void, Err> {
 #define DITTO_UNWRAP(expression)   \
   ({                               \
     auto _result = expression;     \
+    DITTO_VERIFY(_result.is_ok())  \
     std::move(_result).ok_value(); \
   })
 
@@ -270,6 +271,7 @@ class [[nodiscard]] Result<void, Err> {
 #define DITTO_UNWRAP_ERR(expression)  \
   ({                                  \
     auto _result = expression;        \
+    DITTO_VERIFY(_result.is_error())  \
     std::move(_result).error_value(); \
   })
 
