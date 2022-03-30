@@ -10,6 +10,11 @@ namespace Ditto {
  * @brief Non owning pointer that cannot be null
  */
 
+#if defined(__GNUC__) && !defined(__clang__)
+// GCC does not define _Nonnull
+#define _Nonnull
+#endif
+
 template <class T>
 class NonNullPtr final {
  public:
