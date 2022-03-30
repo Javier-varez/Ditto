@@ -145,7 +145,7 @@ TEST(ResultTest, unwrap) {
   EXPECT_EQ(DITTO_UNWRAP(result), 123);
 
   result = Result<uint32_t, const char*>::error("");
-  EXPECT_CALL(assert, assert_failed(_, _, _));
+  EXPECT_CALL(assert, assert_failed(_, _, _)).Times(2);
   DITTO_UNWRAP(result);
 
   Ditto::g_assert = nullptr;
@@ -176,7 +176,7 @@ TEST(ResultTest, unwrap_err) {
   Ditto::g_assert = &assert;
 
   auto result = Result<const char*, uint32_t>::ok("");
-  EXPECT_CALL(assert, assert_failed(_, _, _));
+  EXPECT_CALL(assert, assert_failed(_, _, _)).Times(2);
   DITTO_UNWRAP_ERR(result);
 
   result = Result<const char*, uint32_t>::error(123U);
