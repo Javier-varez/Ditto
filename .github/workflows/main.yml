@@ -8,11 +8,7 @@ on:
 
 jobs:
   tests_with_std_containers:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout
@@ -25,17 +21,13 @@ jobs:
         cmakeAppendedArgs: '-D BUILD_DITTO_TESTS=ON -D USE_STD_TEMPLATES=ON'
         buildDirectory: '${{ github.workspace }}/build'
       env:
-        CC: ${{ matrix.os == 'ubuntu-latest' && 'clang-12' || 'clang' }}
-        CXX: ${{ matrix.os == 'ubuntu-latest' && 'clang++-12' || 'clang++' }}
+        CC: 'clang-12'
+        CXX: 'clang++-12'
     - name: Execute tests
       run: '${{ github.workspace }}/build/DittoTests'
 
   tests_without_std_containers:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout
@@ -48,8 +40,8 @@ jobs:
         cmakeAppendedArgs: '-D BUILD_DITTO_TESTS=ON'
         buildDirectory: '${{ github.workspace }}/build'
       env:
-        CC: ${{ matrix.os == 'ubuntu-latest' && 'clang-12' || 'clang' }}
-        CXX: ${{ matrix.os == 'ubuntu-latest' && 'clang++-12' || 'clang++' }}
+        CC: 'clang-12'
+        CXX: 'clang++-12'
     - name: Execute tests
       run: '${{ github.workspace }}/build/DittoTests'
 
