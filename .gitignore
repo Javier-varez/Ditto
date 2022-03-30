@@ -4,5 +4,5 @@ std_build
 **/.cache
 **/iwyu_report.txt
 **/.DS_Store
-cmake-build-default
+cmake-build-*
 .idea
