@@ -13,6 +13,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
+        compiler: [gcc, clang]
 
     steps:
     - name: Checkout
@@ -25,8 +26,8 @@ jobs:
         cmakeAppendedArgs: '-D BUILD_DITTO_TESTS=ON -D USE_STD_TEMPLATES=ON'
         buildDirectory: '${{ github.workspace }}/build'
       env:
-        CC: ${{ matrix.os == 'ubuntu-latest' && 'clang-12' || 'clang' }}
-        CXX: ${{ matrix.os == 'ubuntu-latest' && 'clang++-12' || 'clang++' }}
+        CC: ${{ matrix.compiler == 'gcc' && 'gcc' || matrix.os == 'ubuntu-latest' && 'clang-12' || 'clang' }}
+        CXX: ${{ matrix.compiler == 'gcc' && 'gcc' || matrix.os == 'ubuntu-latest' && 'clang++-12' || 'clang++' }}
     - name: Execute tests
       run: '${{ github.workspace }}/build/DittoTests'
 
@@ -48,8 +49,8 @@ jobs:
         cmakeAppendedArgs: '-D BUILD_DITTO_TESTS=ON'
         buildDirectory: '${{ github.workspace }}/build'
       env:
-        CC: ${{ matrix.os == 'ubuntu-latest' && 'clang-12' || 'clang' }}
-        CXX: ${{ matrix.os == 'ubuntu-latest' && 'clang++-12' || 'clang++' }}
+        CC: ${{ matrix.compiler == 'gcc' && 'gcc' || matrix.os == 'ubuntu-latest' && 'clang-12' || 'clang' }}
+        CXX: ${{ matrix.compiler == 'gcc' && 'gcc' || matrix.os == 'ubuntu-latest' && 'clang++-12' || 'clang++' }}
     - name: Execute tests
       run: '${{ github.workspace }}/build/DittoTests'
 
