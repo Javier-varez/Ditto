@@ -65,6 +65,7 @@ if (BUILD_DITTO_TESTS)
             test/red_black_tree.cpp
             test/enumerate.cpp
             test/fixed_flat_map.cpp
+            test/fixed_vector.cpp
     )
 
     target_include_directories(DittoTests PRIVATE test)
