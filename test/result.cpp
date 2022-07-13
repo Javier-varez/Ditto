@@ -1,4 +1,3 @@
-
 #include "ditto/result.h"
 
 #include <gmock/gmock.h>
@@ -100,7 +99,9 @@ TEST(ResultTest, verify_err) {
   StrictMock<Ditto::MockAssert> assert;
   Ditto::g_assert = &assert;
 
-  auto returns_result = []() -> Result<void, uint32_t> { return 123; };
+  auto returns_result = []() -> Result<void, uint32_t> {
+    return Result<void, uint32_t>::error(123u);
+  };
   DITTO_VERIFY_ERR(returns_result());
 
   EXPECT_CALL(assert, assert_failed(_, _, _));
@@ -203,4 +204,31 @@ TEST(ResultTest, unwrap_err_or_else) {
   result = Result<const char*, uint32_t>::ok("");
   EXPECT_EQ(DITTO_UNWRAP_ERR_OR_ELSE(result, else_functor), 0);
   EXPECT_EQ(DITTO_UNWRAP_ERR_OR_ELSE(result, else_functor), 1);
+}
+
+TEST(ResultTest, SameTypes) {
+  auto divide_and_add = [](uint32_t numerator, uint32_t denominator,
+                           uint32_t add) -> Result<double, uint32_t> {
+    auto division = [](uint32_t numerator,
+                       uint32_t denominator) -> Result<uint32_t, uint32_t> {
+      if (denominator == 0) {
+        return Result<uint32_t, uint32_t>::error(0xFFFF5A5Au);
+      }
+      return Result<uint32_t, uint32_t>::ok(numerator / denominator);
+    };
+
+    uint32_t division_result =
+        DITTO_PROPAGATE(division(numerator, denominator));
+
+    return Result<double, uint32_t>::ok(
+        static_cast<double>(division_result + add));
+  };
+
+  auto result = divide_and_add(12, 0, 1);
+  EXPECT_TRUE(result.is_error());
+  EXPECT_EQ(result.error_value(), 0xFFFF5A5Au);
+
+  result = divide_and_add(12, 2, 1);
+  EXPECT_TRUE(result.is_ok());
+  EXPECT_EQ(result.ok_value(), 7);
 }
