@@ -47,14 +47,14 @@ requires Hashable<H, K> class FixedFlatMap {
     const auto slot = find_slot(hash, key);
     auto& meta = m_metadata[slot];
     if (meta.isUsed()) {
-      return Error::KeyAlreadyUsed;
+      return Ditto::Result<V*, Error>::error(Error::KeyAlreadyUsed);
     }
 
     auto new_element =
         new (&m_storage[slot]) KvPair{key, std::forward<T>(args)...};
     meta.setUsed(hash);
 
-    return &new_element->right();
+    return Ditto::Result<V*, Error>::ok(&new_element->right());
   }
 
   Ditto::Result<V*, Error> operator[](const K& key) {
@@ -62,11 +62,11 @@ requires Hashable<H, K> class FixedFlatMap {
     const auto slot = find_slot(hash, key);
     auto& meta = m_metadata[slot];
     if (!meta.isUsed()) {
-      return Error::KeyNotFound;
+      return Ditto::Result<V*, Error>::error(Error::KeyNotFound);
     }
 
     auto kv_pair = reinterpret_cast<KvPair*>(&m_storage[slot]);
-    return &kv_pair->right();
+    return Ditto::Result<V*, Error>::ok(&kv_pair->right());
   }
 
   Ditto::Result<void, Error> remove(const K& key) {
@@ -74,7 +74,7 @@ requires Hashable<H, K> class FixedFlatMap {
     const auto slot = find_slot(hash, key);
     auto& meta = m_metadata[slot];
     if (!meta.isUsed()) {
-      return Error::KeyNotFound;
+      return Ditto::Result<void, Error>::error(Error::KeyNotFound);
     }
 
     meta.setDeleted();

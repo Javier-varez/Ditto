@@ -11,62 +11,80 @@
 
 namespace Ditto {
 
+namespace detail {
+
+template <class T>
+struct [[nodiscard]] ErrSentinel {
+  explicit ErrSentinel(T val) : value{std::move(val)} {}
+  T value;
+};
+
+template <class T>
+struct [[nodiscard]] OkSentinel {
+  explicit OkSentinel(T val) : value{std::move(val)} {}
+  T value;
+};
+
+}  // namespace detail
+
 template <class Ok, class Err>
 class [[nodiscard]] Result {
  public:
-  // Implicit construction from an object of type Ok
-  Result(Ok val) {
-    new (&m_memory_buffer) Ok{std::move(val)};
-    m_is_ok = true;
+  // Constructors used for propagating errors or values
+  Result(detail::OkSentinel<Ok> val) noexcept : m_is_ok{true} {
+    new (&m_memory_buffer) Ok{std::move(val.value)};
   }
 
-  Result(Err val) {
-    new (&m_memory_buffer) Err{std::move(val)};
-    m_is_ok = false;
+  Result(detail::ErrSentinel<Err> val) noexcept : m_is_ok{false} {
+    new (&m_memory_buffer) Err{std::move(val.value)};
   }
 
   /// Construct an Ok object with perfect forwarding
   template <class... Args>
-  [[nodiscard]] static Result ok(Args... args) {
-    Result result;
-    new (&result.m_memory_buffer) Ok{std::forward<Args>(args)...};
-    result.m_is_ok = true;
-    return result;
+  [[nodiscard]] static Result ok(Args... args) noexcept {
+    return Result{detail::OkSentinel<Ok>{std::forward<Args>(args)...}};
   }
 
   /// Construct an Err object with perfect forwarding
   template <class... Args>
-  [[nodiscard]] static Result error(Args... args) {
-    Result result;
-    new (&result.m_memory_buffer) Err{std::forward<Args>(args)...};
-    result.m_is_ok = false;
-    return result;
+  [[nodiscard]] static Result error(Args... args) noexcept {
+    return Result{detail::ErrSentinel<Err>{std::forward<Args>(args)...}};
   }
 
-  [[nodiscard]] bool is_error() const { return !m_is_ok; }
-  [[nodiscard]] bool is_ok() const { return m_is_ok; }
+  [[nodiscard]] bool is_error() const noexcept { return !m_is_ok; }
+  [[nodiscard]] bool is_ok() const noexcept { return m_is_ok; }
 
-  [[nodiscard]] Ok& ok_value()& {
+  [[nodiscard]] const Ok& ok_value() const& noexcept {
+    DITTO_VERIFY(m_is_ok);
+    return *reinterpret_cast<const Ok*>(&m_memory_buffer);
+  }
+
+  [[nodiscard]] Ok& ok_value()& noexcept {
     DITTO_VERIFY(m_is_ok);
     return *reinterpret_cast<Ok*>(&m_memory_buffer);
   }
 
-  [[nodiscard]] Ok&& ok_value()&& {
+  [[nodiscard]] Ok&& ok_value()&& noexcept {
     DITTO_VERIFY(m_is_ok);
     return std::move(*reinterpret_cast<Ok*>(&m_memory_buffer));
   }
 
-  [[nodiscard]] Err& error_value()& {
+  [[nodiscard]] const Err& error_value() const& noexcept {
+    DITTO_VERIFY(!m_is_ok);
+    return *reinterpret_cast<const Err*>(&m_memory_buffer);
+  }
+
+  [[nodiscard]] Err& error_value()& noexcept {
     DITTO_VERIFY(!m_is_ok);
     return *reinterpret_cast<Err*>(&m_memory_buffer);
   }
 
-  [[nodiscard]] Err&& error_value()&& {
+  [[nodiscard]] Err&& error_value()&& noexcept {
     DITTO_VERIFY(!m_is_ok);
     return std::move(*reinterpret_cast<Err*>(&m_memory_buffer));
   }
 
-  ~Result() {
+  ~Result() noexcept {
     if (m_is_ok) {
       auto* ok = reinterpret_cast<Ok*>(&m_memory_buffer);
       ok->~Ok();
@@ -76,10 +94,11 @@ class [[nodiscard]] Result {
     }
   }
 
-  Result(const Result&) = default;
-  Result(Result &&) = default;
-  Result& operator=(const Result&) = default;
-  Result& operator=(Result&&) = default;
+  Result(const Result&) noexcept = default;
+  Result(Result &&) noexcept = default;
+
+  Result& operator=(const Result&) noexcept = default;
+  Result& operator=(Result&&) noexcept = default;
 
  private:
   constexpr static std::size_t ALIGNMENT = std::max(alignof(Ok), alignof(Err));
@@ -87,66 +106,59 @@ class [[nodiscard]] Result {
   bool m_is_ok = false;
   typename std::aligned_storage<BUFFER_SIZE, ALIGNMENT>::type m_memory_buffer;
 
-  static_assert(
-      !std::is_same_v<Ok, Err>,
-      "Cannot create a result where the Ok type and Err types are the same");
-
-  Result() = default;
+  Result() noexcept = default;
 };
 
 template <class Ok>
 class [[nodiscard]] Result<Ok, void> {
  public:
-  // Implicit construction from an object of type Ok
-  Result(Ok val) {
-    new (&m_memory_buffer) Ok{std::move(val)};
-    m_is_ok = true;
+  // Constructors used for propagating errors or values
+  Result(detail::OkSentinel<Ok> val) noexcept : m_is_ok{true} {
+    new (&m_memory_buffer) Ok{std::move(val.value)};
   }
 
   template <class... Args>
-  [[nodiscard]] static Result ok(Args... args) {
-    auto result = Result{};
-    new (&result.m_memory_buffer) Ok{std::forward<Args>(args)...};
-    result.m_is_ok = true;
-    return result;
+  [[nodiscard]] static Result ok(Args... args) noexcept {
+    return Result{detail::OkSentinel<Ok>{std::forward<Args>(args)...}};
   }
 
-  [[nodiscard]] static Result error() { return Result{}; }
+  [[nodiscard]] static Result error() noexcept { return Result{}; }
 
-  [[nodiscard]] bool is_error() const { return !m_is_ok; }
-  [[nodiscard]] bool is_ok() const { return m_is_ok; }
+  [[nodiscard]] bool is_error() const noexcept { return !m_is_ok; }
+  [[nodiscard]] bool is_ok() const noexcept { return m_is_ok; }
 
-  [[nodiscard]] Ok& ok_value()& {
+  [[nodiscard]] const Ok& ok_value() const& noexcept {
     DITTO_VERIFY(m_is_ok);
     return *reinterpret_cast<Ok*>(&m_memory_buffer);
   }
 
-  [[nodiscard]] Ok&& ok_value()&& {
+  [[nodiscard]] Ok& ok_value()& noexcept {
+    DITTO_VERIFY(m_is_ok);
+    return *reinterpret_cast<Ok*>(&m_memory_buffer);
+  }
+
+  [[nodiscard]] Ok&& ok_value()&& noexcept {
     DITTO_VERIFY(m_is_ok);
     return std::move(*reinterpret_cast<Ok*>(&m_memory_buffer));
   }
 
-  ~Result() {
+  ~Result() noexcept {
     if (m_is_ok) {
       auto* ok = reinterpret_cast<Ok*>(&m_memory_buffer);
       ok->~Ok();
     }
   }
 
-  Result(const Result&) = default;
-  Result(Result &&) = default;
-  Result& operator=(const Result&) = default;
-  Result& operator=(Result&&) = default;
+  Result(const Result&) noexcept = default;
+  Result(Result &&) noexcept = default;
+  Result& operator=(const Result&) noexcept = default;
+  Result& operator=(Result&&) noexcept = default;
 
  private:
   constexpr static std::size_t ALIGNMENT = alignof(Ok);
   constexpr static std::size_t BUFFER_SIZE = sizeof(Ok);
   bool m_is_ok = false;
   typename std::aligned_storage<BUFFER_SIZE, ALIGNMENT>::type m_memory_buffer;
-
-  static_assert(
-      !std::is_same_v<Ok, void>,
-      "Cannot create a result where the Ok type and Err types are the same");
 
   Result() = default;
 };
@@ -155,96 +167,116 @@ template <class Err>
 class [[nodiscard]] Result<void, Err> {
  public:
   // Implicit construction from an object of type Err
-  Result(Err val) {
-    new (&m_memory_buffer) Err{std::move(val)};
-    m_is_ok = false;
+  Result(detail::ErrSentinel<Err> val) noexcept : m_is_ok{false} {
+    new (&m_memory_buffer) Err{std::move(val.value)};
   }
 
-  [[nodiscard]] static Result ok() {
-    Result result;
-    result.m_is_ok = true;
-    return result;
-  }
+  [[nodiscard]] static Result ok() noexcept { return Result{}; }
 
   template <class... Args>
-  [[nodiscard]] static Result error(Args... args) {
-    Result result;
-    new (&result.m_memory_buffer) Err{std::forward<Args>(args)...};
-    result.m_is_ok = false;
-    return result;
+  [[nodiscard]] static Result error(Args... args) noexcept {
+    return Result{detail::ErrSentinel<Err>{std::forward<Args>(args)...}};
   }
 
-  [[nodiscard]] bool is_error() const { return !m_is_ok; }
-  [[nodiscard]] bool is_ok() const { return m_is_ok; }
+  [[nodiscard]] bool is_error() const noexcept { return !m_is_ok; }
+  [[nodiscard]] bool is_ok() const noexcept { return m_is_ok; }
 
-  [[nodiscard]] Err& error_value()& {
+  [[nodiscard]] const Err& error_value() const& noexcept {
     DITTO_VERIFY(!m_is_ok);
     return *reinterpret_cast<Err*>(&m_memory_buffer);
   }
 
-  [[nodiscard]] Err&& error_value()&& {
+  [[nodiscard]] Err& error_value()& noexcept {
+    DITTO_VERIFY(!m_is_ok);
+    return *reinterpret_cast<Err*>(&m_memory_buffer);
+  }
+
+  [[nodiscard]] Err&& error_value()&& noexcept {
     DITTO_VERIFY(!m_is_ok);
     return std::move(*reinterpret_cast<Err*>(&m_memory_buffer));
   }
 
-  ~Result() {
+  ~Result() noexcept {
     if (!m_is_ok) {
       auto* err = reinterpret_cast<Err*>(&m_memory_buffer);
       err->~Err();
     }
   }
 
-  Result(const Result&) = default;
-  Result(Result &&) = default;
-  Result& operator=(const Result&) = default;
-  Result& operator=(Result&&) = default;
+  Result(const Result&) noexcept = default;
+  Result(Result &&) noexcept = default;
+  Result& operator=(const Result&) noexcept = default;
+  Result& operator=(Result&&) noexcept = default;
 
  private:
   constexpr static std::size_t ALIGNMENT = alignof(Err);
   constexpr static std::size_t BUFFER_SIZE = sizeof(Err);
-  bool m_is_ok = false;
+  bool m_is_ok = true;
   typename std::aligned_storage<BUFFER_SIZE, ALIGNMENT>::type m_memory_buffer;
 
-  static_assert(
-      !std::is_same_v<Err, void>,
-      "Cannot create a result where the Ok type and Err types are the same");
-
-  Result() = default;
+  Result() noexcept = default;
 };
 
-#define DITTO_VERIFY_OK(expression)          \
-  {                                          \
-    auto _evaluated_result = expression;     \
-    DITTO_VERIFY(_evaluated_result.is_ok()); \
+template <>
+class [[nodiscard]] Result<void, void> {
+ public:
+  [[nodiscard]] static Result ok() noexcept {
+    return Result{true};
+    ;
   }
 
-#define DITTO_VERIFY_ERR(expression)            \
-  {                                             \
-    auto _evaluated_result = expression;        \
-    DITTO_VERIFY(_evaluated_result.is_error()); \
+  [[nodiscard]] static Result error() noexcept { return Result{false}; }
+
+  [[nodiscard]] bool is_error() const noexcept { return !m_is_ok; }
+  [[nodiscard]] bool is_ok() const noexcept { return m_is_ok; }
+
+  [[nodiscard]] explicit operator bool() const noexcept { return m_is_ok; }
+
+  ~Result() noexcept {}
+
+  Result(const Result&) noexcept = default;
+  Result(Result &&) noexcept = default;
+  Result& operator=(const Result&) noexcept = default;
+  Result& operator=(Result&&) noexcept = default;
+
+ private:
+  bool m_is_ok = false;
+  explicit Result(bool ok) : m_is_ok{ok} {}
+};
+
+#define DITTO_VERIFY_OK(expression)               \
+  {                                               \
+    Ditto::Result _evaluated_result = expression; \
+    DITTO_VERIFY(_evaluated_result.is_ok());      \
   }
 
-#define DITTO_PROPAGATE(expression)            \
-  ({                                           \
-    auto _result = expression;                 \
-    if (_result.is_error()) {                  \
-      /* This forces a move of the value*/     \
-      return std::move(_result).error_value(); \
-    }                                          \
-    /* This forces a move of the value*/       \
-    std::move(_result).ok_value();             \
+#define DITTO_VERIFY_ERR(expression)              \
+  {                                               \
+    Ditto::Result _evaluated_result = expression; \
+    DITTO_VERIFY(_evaluated_result.is_error());   \
+  }
+
+#define DITTO_PROPAGATE(expression)                                          \
+  ({                                                                         \
+    Ditto::Result _result = expression;                                      \
+    if (_result.is_error()) {                                                \
+      /* This forces a move of the value*/                                   \
+      return {Ditto::detail::ErrSentinel{std::move(_result).error_value()}}; \
+    }                                                                        \
+    /* This forces a move of the value*/                                     \
+    std::move(_result).ok_value();                                           \
   })
 
-#define DITTO_UNWRAP(expression)   \
-  ({                               \
-    auto _result = expression;     \
-    DITTO_VERIFY(_result.is_ok())  \
-    std::move(_result).ok_value(); \
+#define DITTO_UNWRAP(expression)        \
+  ({                                    \
+    Ditto::Result _result = expression; \
+    DITTO_VERIFY(_result.is_ok())       \
+    std::move(_result).ok_value();      \
   })
 
 #define DITTO_UNWRAP_OR(expression, alternative) \
   ({                                             \
-    auto _result = expression;                   \
+    Ditto::Result _result = expression;          \
     auto unwrap_or = [&]() {                     \
       if (_result.is_ok()) {                     \
         return std::move(_result).ok_value();    \
@@ -257,7 +289,7 @@ class [[nodiscard]] Result<void, Err> {
 
 #define DITTO_UNWRAP_OR_ELSE(expression, functor) \
   ({                                              \
-    auto _result = expression;                    \
+    Ditto::Result _result = expression;           \
     auto unwrap_or = [&]() {                      \
       if (_result.is_ok()) {                      \
         return std::move(_result).ok_value();     \
@@ -268,16 +300,16 @@ class [[nodiscard]] Result<void, Err> {
     unwrap_or();                                  \
   })
 
-#define DITTO_UNWRAP_ERR(expression)  \
-  ({                                  \
-    auto _result = expression;        \
-    DITTO_VERIFY(_result.is_error())  \
-    std::move(_result).error_value(); \
+#define DITTO_UNWRAP_ERR(expression)    \
+  ({                                    \
+    Ditto::Result _result = expression; \
+    DITTO_VERIFY(_result.is_error())    \
+    std::move(_result).error_value();   \
   })
 
 #define DITTO_UNWRAP_ERR_OR(expression, alternative) \
   ({                                                 \
-    auto _result = expression;                       \
+    Ditto::Result _result = expression;              \
     auto unwrap_or = [&]() {                         \
       if (_result.is_error()) {                      \
         return std::move(_result).error_value();     \
@@ -290,7 +322,7 @@ class [[nodiscard]] Result<void, Err> {
 
 #define DITTO_UNWRAP_ERR_OR_ELSE(expression, functor) \
   ({                                                  \
-    auto _result = expression;                        \
+    Ditto::Result _result = expression;               \
     auto unwrap_or = [&]() {                          \
       if (_result.is_error()) {                       \
         return std::move(_result).error_value();      \

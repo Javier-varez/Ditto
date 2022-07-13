@@ -169,25 +169,25 @@ class FixedVector {
   template <class... U>
   auto emplace(U... args) noexcept -> Result<T*, Error> {
     if (m_length == CAPACITY) {
-      return Error::VectorIsFull;
+      return Result<T*, Error>::error(Error::VectorIsFull);
     }
 
     auto* val = new (&m_storage[m_length++]) T{std::forward<U>(args)...};
-    return val;
+    return Result<T*, Error>::ok(val);
   }
 
   auto push(T value) noexcept -> Result<T*, Error> {
     if (m_length == CAPACITY) {
-      return Error::VectorIsFull;
+      return Result<T*, Error>::error(Error::VectorIsFull);
     }
 
     auto* val = new (&m_storage[m_length++]) T{std::move(value)};
-    return val;
+    return Result<T*, Error>::ok(val);
   }
 
   auto pop() noexcept -> Ditto::Result<T, Error> {
     if (m_length == 0) {
-      return Error::VectorIsEmpty;
+      return Result<T*, Error>::error(Error::VectorIsEmpty);
     }
 
     const auto idx = m_length;
@@ -197,25 +197,26 @@ class FixedVector {
     const T ret_item = std::move(inner_item);
 
     inner_item->~T();
-    return ret_item;
+    return Result<T, Error>::oK(ret_item);
   }
 
   [[nodiscard]] auto size() const noexcept -> std::size_t { return m_length; }
 
   auto operator[](std::size_t index) noexcept -> Result<T*, Error> {
     if (index >= m_length) {
-      return Error::IndexOutOfRange;
+      return Result<T*, Error>::error(Error::IndexOutOfRange);
     }
 
-    return reinterpret_cast<T*>(&m_storage[index]);
+    return Result<T*, Error>::ok(reinterpret_cast<T*>(&m_storage[index]));
   }
 
   auto operator[](std::size_t index) const noexcept -> Result<const T*, Error> {
     if (index >= m_length) {
-      return Error::IndexOutOfRange;
+      return Result<const T*, Error>::error(Error::IndexOutOfRange);
     }
 
-    return reinterpret_cast<const T*>(&m_storage[index]);
+    return Result<const T*, Error>::ok(
+        reinterpret_cast<const T*>(&m_storage[index]));
   }
 
   auto cbegin() -> Iterator<const T> { return Iterator<const T>{this, 0}; }
