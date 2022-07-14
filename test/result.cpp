@@ -138,6 +138,41 @@ TEST(ResultTest, propagate_error) {
   EXPECT_EQ(result.ok_value(), 7);
 }
 
+TEST(ResultTest, propagate_ok) {
+  enum class InnerError { DivideByZero, Other };
+
+  enum class OuterError { DivisionError, Unknown };
+  auto wrapped_division =
+      [](uint32_t numerator,
+         uint32_t denominator) -> Result<uint32_t, OuterError> {
+    auto division = [](uint32_t numerator,
+                       uint32_t denominator) -> Result<uint32_t, InnerError> {
+      if (denominator == 0) {
+        return Result<uint32_t, InnerError>::error(InnerError::DivideByZero);
+      }
+      return Result<uint32_t, InnerError>::ok(numerator / denominator);
+    };
+
+    const InnerError error =
+        DITTO_PROPAGATE_OK(division(numerator, denominator));
+
+    switch (error) {
+      case InnerError::DivideByZero:
+        return Result<uint32_t, OuterError>::error(OuterError::DivisionError);
+      case InnerError::Other:
+        return Result<uint32_t, OuterError>::error(OuterError::Unknown);
+    }
+  };
+
+  auto result = wrapped_division(12, 0);
+  EXPECT_TRUE(result.is_error());
+  EXPECT_EQ(result.error_value(), OuterError::DivisionError);
+
+  result = wrapped_division(12, 2);
+  EXPECT_TRUE(result.is_ok());
+  EXPECT_EQ(result.ok_value(), 6);
+}
+
 TEST(ResultTest, unwrap) {
   StrictMock<Ditto::MockAssert> assert;
   Ditto::g_assert = &assert;
@@ -231,4 +266,41 @@ TEST(ResultTest, SameTypes) {
   result = divide_and_add(12, 2, 1);
   EXPECT_TRUE(result.is_ok());
   EXPECT_EQ(result.ok_value(), 7);
+}
+
+TEST(ResultTest, MapOk) {
+  const auto map_func = [](uint32_t val) -> double {
+    return static_cast<double>(val);
+  };
+  Result result = Result<uint32_t, bool>::ok(123u).map_ok(map_func);
+  EXPECT_TRUE(result.is_ok());
+  EXPECT_EQ(static_cast<uint32_t>(result.ok_value()), 123u);
+
+  result = Result<uint32_t, bool>::error(false).map_ok(map_func);
+  EXPECT_TRUE(result.is_error());
+  EXPECT_FALSE(result.error_value());
+  result = Result<uint32_t, bool>::error(true).map_ok(map_func);
+  EXPECT_TRUE(result.is_error());
+  EXPECT_TRUE(result.error_value());
+}
+
+TEST(ResultTest, MapErr) {
+  const auto map_func = [](bool val) -> const char* {
+    if (val) {
+      return "true";
+    }
+    return "false";
+  };
+
+  Result result = Result<uint32_t, bool>::error(false).map_err(map_func);
+  EXPECT_TRUE(result.is_error());
+  EXPECT_STREQ(result.error_value(), "false");
+
+  result = Result<uint32_t, bool>::error(true).map_err(map_func);
+  EXPECT_TRUE(result.is_error());
+  EXPECT_STREQ(result.error_value(), "true");
+
+  result = Result<uint32_t, bool>::ok(1234u).map_err(map_func);
+  EXPECT_TRUE(result.is_ok());
+  EXPECT_EQ(result.ok_value(), 1234u);
 }
