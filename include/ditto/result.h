@@ -15,13 +15,13 @@ namespace detail {
 
 template <class T>
 struct [[nodiscard]] ErrSentinel {
-  explicit ErrSentinel(T val) : value{std::move(val)} {}
+  explicit ErrSentinel(T val) noexcept : value{std::move(val)} {}
   T value;
 };
 
 template <class T>
 struct [[nodiscard]] OkSentinel {
-  explicit OkSentinel(T val) : value{std::move(val)} {}
+  explicit OkSentinel(T val) noexcept : value{std::move(val)} {}
   T value;
 };
 
@@ -82,6 +82,24 @@ class [[nodiscard]] Result {
   [[nodiscard]] Err&& error_value()&& noexcept {
     DITTO_VERIFY(!m_is_ok);
     return std::move(*reinterpret_cast<Err*>(&m_memory_buffer));
+  }
+
+  template <typename Callable>
+  [[nodiscard]] auto map_ok(Callable callable) noexcept
+      ->Result<decltype(std::declval<Callable>()(std::declval<Ok>())), Err> {
+    if (!is_ok()) {
+      return {detail::ErrSentinel<Err>{error_value()}};
+    }
+    return {detail::OkSentinel{callable(ok_value())}};
+  }
+
+  template <typename Callable>
+  [[nodiscard]] auto map_err(Callable callable) noexcept
+      ->Result<Ok, decltype(std::declval<Callable>()(std::declval<Err>()))> {
+    if (!is_error()) {
+      return {detail::OkSentinel<Ok>{ok_value()}};
+    }
+    return {detail::ErrSentinel{callable(error_value())}};
   }
 
   ~Result() noexcept {
@@ -154,6 +172,16 @@ class [[nodiscard]] Result<Ok, void> {
   Result& operator=(const Result&) noexcept = default;
   Result& operator=(Result&&) noexcept = default;
 
+  template <typename Callable>
+  [[nodiscard]] auto map_ok(Callable callable) noexcept
+      ->Result<decltype(std::declval<Callable>()(std::declval<Ok>())), void> {
+    if (!is_ok()) {
+      return Result<decltype(std::declval<Callable>()(std::declval<Ok>())),
+                    void>::error();
+    }
+    return {detail::OkSentinel{callable(ok_value())}};
+  }
+
  private:
   constexpr static std::size_t ALIGNMENT = alignof(Ok);
   constexpr static std::size_t BUFFER_SIZE = sizeof(Ok);
@@ -208,6 +236,16 @@ class [[nodiscard]] Result<void, Err> {
   Result& operator=(const Result&) noexcept = default;
   Result& operator=(Result&&) noexcept = default;
 
+  template <typename Callable>
+  [[nodiscard]] auto map_err(Callable callable) noexcept
+      ->Result<void, decltype(std::declval<Callable>()(std::declval<Err>()))> {
+    if (!is_error()) {
+      return Result<void, decltype(std::declval<Callable>()(
+                              std::declval<Err>()))>::ok();
+    }
+    return {detail::ErrSentinel{callable(error_value())}};
+  }
+
  private:
   constexpr static std::size_t ALIGNMENT = alignof(Err);
   constexpr static std::size_t BUFFER_SIZE = sizeof(Err);
@@ -260,11 +298,18 @@ class [[nodiscard]] Result<void, void> {
   ({                                                                         \
     Ditto::Result _result = expression;                                      \
     if (_result.is_error()) {                                                \
-      /* This forces a move of the value*/                                   \
       return {Ditto::detail::ErrSentinel{std::move(_result).error_value()}}; \
     }                                                                        \
-    /* This forces a move of the value*/                                     \
     std::move(_result).ok_value();                                           \
+  })
+
+#define DITTO_PROPAGATE_OK(expression)                                   \
+  ({                                                                     \
+    Ditto::Result _result = expression;                                  \
+    if (_result.is_ok()) {                                               \
+      return {Ditto::detail::OkSentinel{std::move(_result).ok_value()}}; \
+    }                                                                    \
+    std::move(_result).error_value();                                    \
   })
 
 #define DITTO_UNWRAP(expression)        \
