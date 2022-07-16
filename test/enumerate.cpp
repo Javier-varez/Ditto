@@ -3,6 +3,9 @@
 #include <gtest/gtest.h>
 
 #include <map>
+#include <string>
+#include <utility>
+#include <vector>
 
 using Ditto::make_enumerated_iter;
 

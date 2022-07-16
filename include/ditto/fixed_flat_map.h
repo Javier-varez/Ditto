@@ -1,6 +1,14 @@
 #ifndef DITTO_FIXED_FLAT_MAP_H_
 #define DITTO_FIXED_FLAT_MAP_H_
 
+#include <array>
+#include <cstddef>
+#include <cstdint>
+#include <new>
+#include <type_traits>
+#include <utility>
+
+#include "ditto/assert.h"
 #include "ditto/hash.h"
 #include "ditto/pair.h"
 #include "ditto/result.h"

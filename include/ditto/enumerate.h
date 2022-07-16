@@ -1,7 +1,9 @@
 #ifndef DITTO_ENUMERATE_H_
 #define DITTO_ENUMERATE_H_
 
+#include <cstddef>
 #include <iterator>
+#include <tuple>
 
 namespace Ditto {
 
