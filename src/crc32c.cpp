@@ -1,5 +1,6 @@
-
 #include "ditto/crc32c.h"
+
+#include <array>
 
 #include "ditto/non_null_ptr.h"
 

@@ -1,7 +1,9 @@
-
 #include "ditto/fixed_vector.h"
 
 #include <gtest/gtest.h>
+
+#include <cstdint>
+#include <memory>
 
 TEST(FixedVectorTest, Emplace) {
   static constexpr uint32_t LENGTH = 10;

@@ -1,6 +1,6 @@
-
 #include "ditto/assert.h"
 
+#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 

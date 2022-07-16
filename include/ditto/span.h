@@ -12,11 +12,13 @@ using std::span;
 
 #else  // std::span<T> not available, define our own
 
+#include <algorithm>
 #include <array>
 #include <cstdio>
 #include <iosfwd>
 #include <iterator>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 #include "ditto/assert.h"

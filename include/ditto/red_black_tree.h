@@ -1,9 +1,9 @@
 #ifndef DITTO_RED_BLACK_TREE_H_
 #define DITTO_RED_BLACK_TREE_H_
 
-#include <stdint.h>
-
 #include <algorithm>
+#include <cstdint>
+#include <cstdio>
 #include <memory>
 #include <utility>
 

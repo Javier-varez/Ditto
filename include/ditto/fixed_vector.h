@@ -3,9 +3,12 @@
 
 #include <array>
 #include <compare>
+#include <cstddef>
 #include <cstdint>
 #include <iterator>
+#include <new>
 #include <type_traits>
+#include <utility>
 
 #include "ditto/result.h"
 

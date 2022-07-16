@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <cstdint>
 
 #include "ditto/hash.h"
 #include "ditto/linked_list.h"

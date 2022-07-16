@@ -1,5 +1,6 @@
-
 #include <ditto/arch.h>
+
+#include <cstdint>
 
 namespace Ditto::arch {
 

@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include <memory>
+
 using Ditto::FixedFlatMap;
 
 TEST(FixedFlatMapTest, TinyMap) {
