@@ -25,66 +25,104 @@ struct [[nodiscard]] OkSentinel {
   T value;
 };
 
+template <typename T>
+concept NonVoid = !std::same_as<T, void>;
+
 }  // namespace detail
 
 template <class Ok, class Err>
 class [[nodiscard]] Result {
+ private:
+  template <typename T>
+  struct Instantiable {
+    using type = T;
+  };
+
+  template <>
+  struct Instantiable<void> {
+    using type = std::uint8_t;
+  };
+
  public:
   // Constructors used for propagating errors or values
-  Result(detail::OkSentinel<Ok> val) noexcept : m_is_ok{true} {
-    new (&m_memory_buffer) Ok{std::move(val.value)};
+  template <class... Args, detail::NonVoid T = Ok>
+  Result(detail::OkSentinel<T> val) noexcept : m_is_ok{true} {
+    new (&m_memory_buffer) T{std::move(val.value)};
   }
 
-  Result(detail::ErrSentinel<Err> val) noexcept : m_is_ok{false} {
-    new (&m_memory_buffer) Err{std::move(val.value)};
+  template <class... Args, detail::NonVoid T = Err>
+  Result(detail::ErrSentinel<T> val) noexcept : m_is_ok{false} {
+    new (&m_memory_buffer) T{std::move(val.value)};
   }
 
   /// Construct an Ok object with perfect forwarding
   template <class... Args>
   [[nodiscard]] static Result ok(Args... args) noexcept {
-    return Result{detail::OkSentinel<Ok>{std::forward<Args>(args)...}};
+    if constexpr (std::is_same_v<void, Ok>) {
+      static_assert(sizeof...(Args) == 0,
+                    "Result::ok() does not take arguments for 'void'");
+      Result res{};
+      res.m_is_ok = true;
+      return res;
+    } else {
+      return Result{detail::OkSentinel<Ok>{std::forward<Args>(args)...}};
+    }
   }
 
   /// Construct an Err object with perfect forwarding
   template <class... Args>
   [[nodiscard]] static Result error(Args... args) noexcept {
-    return Result{detail::ErrSentinel<Err>{std::forward<Args>(args)...}};
+    if constexpr (std::is_same_v<void, Err>) {
+      static_assert(sizeof...(Args) == 0,
+                    "Result::error() does not take arguments for 'void'");
+      Result res{};
+      res.m_is_ok = false;
+      return res;
+    } else {
+      return Result{detail::ErrSentinel<Err>{std::forward<Args>(args)...}};
+    }
   }
 
   [[nodiscard]] bool is_error() const noexcept { return !m_is_ok; }
   [[nodiscard]] bool is_ok() const noexcept { return m_is_ok; }
 
-  [[nodiscard]] const Ok& ok_value() const& noexcept {
+  template <detail::NonVoid T = Ok>
+  [[nodiscard]] const T& ok_value() const& noexcept {
     DITTO_VERIFY(m_is_ok);
     return *reinterpret_cast<const Ok*>(&m_memory_buffer);
   }
 
-  [[nodiscard]] Ok& ok_value()& noexcept {
+  template <detail::NonVoid T = Ok>
+  [[nodiscard]] T& ok_value()& noexcept {
     DITTO_VERIFY(m_is_ok);
     return *reinterpret_cast<Ok*>(&m_memory_buffer);
   }
 
-  [[nodiscard]] Ok&& ok_value()&& noexcept {
+  template <detail::NonVoid T = Ok>
+  [[nodiscard]] T&& ok_value()&& noexcept {
     DITTO_VERIFY(m_is_ok);
     return std::move(*reinterpret_cast<Ok*>(&m_memory_buffer));
   }
 
-  [[nodiscard]] const Err& error_value() const& noexcept {
+  template <detail::NonVoid T = Err>
+  [[nodiscard]] const T& error_value() const& noexcept {
     DITTO_VERIFY(!m_is_ok);
     return *reinterpret_cast<const Err*>(&m_memory_buffer);
   }
 
-  [[nodiscard]] Err& error_value()& noexcept {
+  template <detail::NonVoid T = Err>
+  [[nodiscard]] T& error_value()& noexcept {
     DITTO_VERIFY(!m_is_ok);
     return *reinterpret_cast<Err*>(&m_memory_buffer);
   }
 
-  [[nodiscard]] Err&& error_value()&& noexcept {
+  template <detail::NonVoid T = Err>
+  [[nodiscard]] T&& error_value()&& noexcept {
     DITTO_VERIFY(!m_is_ok);
     return std::move(*reinterpret_cast<Err*>(&m_memory_buffer));
   }
 
-  template <typename Callable>
+  template <typename Callable, detail::NonVoid T = Ok>
   [[nodiscard]] auto map_ok(Callable callable) noexcept
       ->Result<decltype(std::declval<Callable>()(std::declval<Ok>())), Err> {
     if (!is_ok()) {
@@ -93,7 +131,7 @@ class [[nodiscard]] Result {
     return {detail::OkSentinel{callable(ok_value())}};
   }
 
-  template <typename Callable>
+  template <typename Callable, detail::NonVoid T = Err>
   [[nodiscard]] auto map_err(Callable callable) noexcept
       ->Result<Ok, decltype(std::declval<Callable>()(std::declval<Err>()))> {
     if (!is_error()) {
@@ -105,10 +143,14 @@ class [[nodiscard]] Result {
   ~Result() noexcept {
     if (m_is_ok) {
       auto* ok = reinterpret_cast<Ok*>(&m_memory_buffer);
-      ok->~Ok();
+      if constexpr (!std::is_same_v<void, Ok>) {
+        ok->~Ok();
+      }
     } else {
       auto* err = reinterpret_cast<Err*>(&m_memory_buffer);
-      err->~Err();
+      if constexpr (!std::is_same_v<void, Err>) {
+        err->~Err();
+      }
     }
   }
 
@@ -119,167 +161,16 @@ class [[nodiscard]] Result {
   Result& operator=(Result&&) noexcept = default;
 
  private:
-  constexpr static std::size_t ALIGNMENT = std::max(alignof(Ok), alignof(Err));
-  constexpr static std::size_t BUFFER_SIZE = std::max(sizeof(Ok), sizeof(Err));
+  using InstantiableOk = typename Instantiable<Ok>::type;
+  using InstantiableErr = typename Instantiable<Err>::type;
+  constexpr static std::size_t ALIGNMENT =
+      std::max(alignof(InstantiableOk), alignof(InstantiableErr));
+  constexpr static std::size_t BUFFER_SIZE =
+      std::max(sizeof(InstantiableOk), sizeof(InstantiableErr));
   bool m_is_ok = false;
   typename std::aligned_storage<BUFFER_SIZE, ALIGNMENT>::type m_memory_buffer;
 
   Result() noexcept = default;
-};
-
-template <class Ok>
-class [[nodiscard]] Result<Ok, void> {
- public:
-  // Constructors used for propagating errors or values
-  Result(detail::OkSentinel<Ok> val) noexcept : m_is_ok{true} {
-    new (&m_memory_buffer) Ok{std::move(val.value)};
-  }
-
-  template <class... Args>
-  [[nodiscard]] static Result ok(Args... args) noexcept {
-    return Result{detail::OkSentinel<Ok>{std::forward<Args>(args)...}};
-  }
-
-  [[nodiscard]] static Result error() noexcept { return Result{}; }
-
-  [[nodiscard]] bool is_error() const noexcept { return !m_is_ok; }
-  [[nodiscard]] bool is_ok() const noexcept { return m_is_ok; }
-
-  [[nodiscard]] const Ok& ok_value() const& noexcept {
-    DITTO_VERIFY(m_is_ok);
-    return *reinterpret_cast<Ok*>(&m_memory_buffer);
-  }
-
-  [[nodiscard]] Ok& ok_value()& noexcept {
-    DITTO_VERIFY(m_is_ok);
-    return *reinterpret_cast<Ok*>(&m_memory_buffer);
-  }
-
-  [[nodiscard]] Ok&& ok_value()&& noexcept {
-    DITTO_VERIFY(m_is_ok);
-    return std::move(*reinterpret_cast<Ok*>(&m_memory_buffer));
-  }
-
-  ~Result() noexcept {
-    if (m_is_ok) {
-      auto* ok = reinterpret_cast<Ok*>(&m_memory_buffer);
-      ok->~Ok();
-    }
-  }
-
-  Result(const Result&) noexcept = default;
-  Result(Result &&) noexcept = default;
-  Result& operator=(const Result&) noexcept = default;
-  Result& operator=(Result&&) noexcept = default;
-
-  template <typename Callable>
-  [[nodiscard]] auto map_ok(Callable callable) noexcept
-      ->Result<decltype(std::declval<Callable>()(std::declval<Ok>())), void> {
-    if (!is_ok()) {
-      return Result<decltype(std::declval<Callable>()(std::declval<Ok>())),
-                    void>::error();
-    }
-    return {detail::OkSentinel{callable(ok_value())}};
-  }
-
- private:
-  constexpr static std::size_t ALIGNMENT = alignof(Ok);
-  constexpr static std::size_t BUFFER_SIZE = sizeof(Ok);
-  bool m_is_ok = false;
-  typename std::aligned_storage<BUFFER_SIZE, ALIGNMENT>::type m_memory_buffer;
-
-  Result() = default;
-};
-
-template <class Err>
-class [[nodiscard]] Result<void, Err> {
- public:
-  // Implicit construction from an object of type Err
-  Result(detail::ErrSentinel<Err> val) noexcept : m_is_ok{false} {
-    new (&m_memory_buffer) Err{std::move(val.value)};
-  }
-
-  [[nodiscard]] static Result ok() noexcept { return Result{}; }
-
-  template <class... Args>
-  [[nodiscard]] static Result error(Args... args) noexcept {
-    return Result{detail::ErrSentinel<Err>{std::forward<Args>(args)...}};
-  }
-
-  [[nodiscard]] bool is_error() const noexcept { return !m_is_ok; }
-  [[nodiscard]] bool is_ok() const noexcept { return m_is_ok; }
-
-  [[nodiscard]] const Err& error_value() const& noexcept {
-    DITTO_VERIFY(!m_is_ok);
-    return *reinterpret_cast<Err*>(&m_memory_buffer);
-  }
-
-  [[nodiscard]] Err& error_value()& noexcept {
-    DITTO_VERIFY(!m_is_ok);
-    return *reinterpret_cast<Err*>(&m_memory_buffer);
-  }
-
-  [[nodiscard]] Err&& error_value()&& noexcept {
-    DITTO_VERIFY(!m_is_ok);
-    return std::move(*reinterpret_cast<Err*>(&m_memory_buffer));
-  }
-
-  ~Result() noexcept {
-    if (!m_is_ok) {
-      auto* err = reinterpret_cast<Err*>(&m_memory_buffer);
-      err->~Err();
-    }
-  }
-
-  Result(const Result&) noexcept = default;
-  Result(Result &&) noexcept = default;
-  Result& operator=(const Result&) noexcept = default;
-  Result& operator=(Result&&) noexcept = default;
-
-  template <typename Callable>
-  [[nodiscard]] auto map_err(Callable callable) noexcept
-      ->Result<void, decltype(std::declval<Callable>()(std::declval<Err>()))> {
-    if (!is_error()) {
-      return Result<void, decltype(std::declval<Callable>()(
-                              std::declval<Err>()))>::ok();
-    }
-    return {detail::ErrSentinel{callable(error_value())}};
-  }
-
- private:
-  constexpr static std::size_t ALIGNMENT = alignof(Err);
-  constexpr static std::size_t BUFFER_SIZE = sizeof(Err);
-  bool m_is_ok = true;
-  typename std::aligned_storage<BUFFER_SIZE, ALIGNMENT>::type m_memory_buffer;
-
-  Result() noexcept = default;
-};
-
-template <>
-class [[nodiscard]] Result<void, void> {
- public:
-  [[nodiscard]] static Result ok() noexcept {
-    return Result{true};
-    ;
-  }
-
-  [[nodiscard]] static Result error() noexcept { return Result{false}; }
-
-  [[nodiscard]] bool is_error() const noexcept { return !m_is_ok; }
-  [[nodiscard]] bool is_ok() const noexcept { return m_is_ok; }
-
-  [[nodiscard]] explicit operator bool() const noexcept { return m_is_ok; }
-
-  ~Result() noexcept {}
-
-  Result(const Result&) noexcept = default;
-  Result(Result &&) noexcept = default;
-  Result& operator=(const Result&) noexcept = default;
-  Result& operator=(Result&&) noexcept = default;
-
- private:
-  bool m_is_ok = false;
-  explicit Result(bool ok) : m_is_ok{ok} {}
 };
 
 #define DITTO_VERIFY_OK(expression)               \
