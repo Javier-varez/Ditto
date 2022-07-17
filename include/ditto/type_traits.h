@@ -31,6 +31,10 @@ using returns_void = std::is_void<::std::result_of_t<Action(Args...)>>;
 template <class Action, class... Args>
 inline constexpr bool returns_void_v = returns_void<Action, Args...>::value;
 
+template <typename T>
+concept ScopedEnum =
+    std::is_enum_v<T> && !std::is_convertible_v<T, std::underlying_type_t<T>>;
+
 }  // namespace Ditto
 
 #endif  // DITTO_TYPE_TRAITS_H_
