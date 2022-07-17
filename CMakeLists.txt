@@ -85,6 +85,7 @@ if (BUILD_DITTO_TESTS)
             test/enumerate.cpp
             test/fixed_flat_map.cpp
             test/fixed_vector.cpp
+            test/error.cpp
     )
 
     target_include_directories(DittoTests PRIVATE test)

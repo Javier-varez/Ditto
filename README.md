@@ -64,6 +64,8 @@ support.
     longer be used and therefore, all screens could be a `Ditto::static_ptr`.
   * `Ditto::SimpleHasher`: Simple hasher implementation that leverages CRC32C as a hasher. It 
     can hash an incoming stream of data and satisfies the Hasher concept.
+  * `Ditto::Error`: Error class that can be a variant of different enum values. Similar to Rust fat 
+    enums.
   * It features a custom assert implementation that can be overriden by the user.
 
 
