@@ -55,4 +55,4 @@ jobs:
       uses: DoozyX/clang-format-lint-action@v0.11
       with:
         source: '.'
-        clangFormatVersion: 10
+        clangFormatVersion: 14
