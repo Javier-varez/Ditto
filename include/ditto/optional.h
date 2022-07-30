@@ -24,7 +24,7 @@ namespace Ditto {
 template <class T>
 class [[nodiscard]] optional {
  public:
-  constexpr optional() noexcept : m_valid(false), m_dummy(false) {}
+  constexpr optional() noexcept : m_dummy(false), m_valid(false) {}
 
   constexpr optional(const optional& other) noexcept
       : m_valid(false), m_dummy(false) {
@@ -33,7 +33,7 @@ class [[nodiscard]] optional {
       m_valid = true;
     }
   }
-  constexpr optional(optional && other) noexcept
+  constexpr optional(optional&& other) noexcept
       : m_valid(false), m_dummy(false) {
     if (other.has_value()) {
       m_member = T{std::move(other).value()};
@@ -51,7 +51,7 @@ class [[nodiscard]] optional {
   }
 
   template <class U>
-  constexpr explicit optional(optional<U> && other)
+  constexpr explicit optional(optional<U>&& other)
       : m_valid(false), m_dummy(false) {
     if (other.has_value()) {
       m_valid = true;
@@ -64,7 +64,7 @@ class [[nodiscard]] optional {
       : m_valid(true), m_member(std::forward<Args>(args)...) {}
 
   template <class U = T>
-  constexpr explicit optional(U && value)
+  constexpr explicit optional(U&& value)
       : m_valid(true), m_member(std::forward<U>(value)) {}
 
   constexpr optional& operator=(const optional& other) noexcept {
@@ -107,13 +107,13 @@ class [[nodiscard]] optional {
     return m_member;
   }
 
-  [[nodiscard]] constexpr T&& value()&& noexcept {
+  [[nodiscard]] constexpr T&& value() && noexcept {
     DITTO_VERIFY(m_valid);
     return std::move(m_member);
   }
 
   template <class U>
-  [[nodiscard]] constexpr T value_or(U && def) const& {
+  [[nodiscard]] constexpr T value_or(U&& def) const& {
     if (m_valid) {
       return m_member;
     }
@@ -121,7 +121,7 @@ class [[nodiscard]] optional {
   }
 
   template <class U>
-  [[nodiscard]] constexpr T value_or(U && def)&& {
+  [[nodiscard]] constexpr T value_or(U&& def) && {
     if (m_valid) {
       return std::move(m_member);
     }
@@ -143,16 +143,22 @@ class [[nodiscard]] optional {
   }
 
   [[nodiscard]] constexpr const T& operator*() const& noexcept {
+    DITTO_VERIFY(m_valid);
     return m_member;
   }
 
-  [[nodiscard]] constexpr T& operator*()& noexcept { return m_member; }
+  [[nodiscard]] constexpr T& operator*() & noexcept {
+    DITTO_VERIFY(m_valid);
+    return m_member;
+  }
 
   [[nodiscard]] constexpr const T&& operator*() const&& noexcept {
+    DITTO_VERIFY(m_valid);
     return std::move(m_member);
   }
 
-  [[nodiscard]] constexpr T&& operator*()&& noexcept {
+  [[nodiscard]] constexpr T&& operator*() && noexcept {
+    DITTO_VERIFY(m_valid);
     return std::move(m_member);
   }
 
