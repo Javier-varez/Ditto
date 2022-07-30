@@ -22,7 +22,6 @@ void walk_stack_trace(C callable) {
   uintptr_t frame_ptr = Ditto::arch::get_frame_pointer();
   auto* stack_frame = reinterpret_cast<const StackFrame*>(frame_ptr);
 
-  uint32_t i = 0;
   while (stack_frame != nullptr) {
     callable(*stack_frame);
     stack_frame = stack_frame->prev;
