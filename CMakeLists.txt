@@ -23,6 +23,11 @@ elseif (DITTO_TARGET_ARCH MATCHES aarch64)
             ${DITTO_SOURCES}
             src/arch/aarch64.cpp
             )
+elseif (DITTO_TARGET_ARCH MATCHES arm)
+    set(DITTO_SOURCES
+            ${DITTO_SOURCES}
+            src/arch/arm.cpp
+            )
 endif ()
 
 add_library(
