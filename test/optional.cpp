@@ -85,7 +85,7 @@ TEST(OptionalTest, arrow_operator) {
   EXPECT_EQ(opt->length(), 5);
 
   EXPECT_EQ(
-      Ditto::optional<std::string> { "hi" }->length(), 2);
+      Ditto::optional<std::string> { "hi" } -> length(), 2);
 
   const Ditto::optional<std::string> const_opt{"hello"};
   EXPECT_EQ(const_opt->length(), 5);

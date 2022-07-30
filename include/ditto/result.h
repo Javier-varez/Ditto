@@ -94,13 +94,13 @@ class [[nodiscard]] Result {
   }
 
   template <detail::NonVoid T = Ok>
-  [[nodiscard]] T& ok_value()& noexcept {
+  [[nodiscard]] T& ok_value() & noexcept {
     DITTO_VERIFY(m_is_ok);
     return *reinterpret_cast<Ok*>(&m_memory_buffer);
   }
 
   template <detail::NonVoid T = Ok>
-  [[nodiscard]] T&& ok_value()&& noexcept {
+  [[nodiscard]] T&& ok_value() && noexcept {
     DITTO_VERIFY(m_is_ok);
     return std::move(*reinterpret_cast<Ok*>(&m_memory_buffer));
   }
@@ -112,20 +112,20 @@ class [[nodiscard]] Result {
   }
 
   template <detail::NonVoid T = Err>
-  [[nodiscard]] T& error_value()& noexcept {
+  [[nodiscard]] T& error_value() & noexcept {
     DITTO_VERIFY(!m_is_ok);
     return *reinterpret_cast<Err*>(&m_memory_buffer);
   }
 
   template <detail::NonVoid T = Err>
-  [[nodiscard]] T&& error_value()&& noexcept {
+  [[nodiscard]] T&& error_value() && noexcept {
     DITTO_VERIFY(!m_is_ok);
     return std::move(*reinterpret_cast<Err*>(&m_memory_buffer));
   }
 
   template <typename Callable, detail::NonVoid T = Ok>
   [[nodiscard]] auto map_ok(Callable callable) noexcept
-      ->Result<decltype(std::declval<Callable>()(std::declval<Ok>())), Err> {
+      -> Result<decltype(std::declval<Callable>()(std::declval<Ok>())), Err> {
     if (!is_ok()) {
       return {detail::ErrSentinel<Err>{error_value()}};
     }
@@ -134,7 +134,7 @@ class [[nodiscard]] Result {
 
   template <typename Callable, detail::NonVoid T = Err>
   [[nodiscard]] auto map_err(Callable callable) noexcept
-      ->Result<Ok, decltype(std::declval<Callable>()(std::declval<Err>()))> {
+      -> Result<Ok, decltype(std::declval<Callable>()(std::declval<Err>()))> {
     if (!is_error()) {
       return {detail::OkSentinel<Ok>{ok_value()}};
     }
@@ -156,7 +156,7 @@ class [[nodiscard]] Result {
   }
 
   Result(const Result&) noexcept = default;
-  Result(Result &&) noexcept = default;
+  Result(Result&&) noexcept = default;
 
   Result& operator=(const Result&) noexcept = default;
   Result& operator=(Result&&) noexcept = default;

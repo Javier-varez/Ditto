@@ -32,7 +32,8 @@ namespace Ditto {
  * map.
  */
 template <class K, class V, uint32_t CAPACITY, class H = SimpleHasher>
-requires Hashable<H, K> class FixedFlatMap {
+requires Hashable<H, K>
+class FixedFlatMap {
  public:
   enum class Error { KeyAlreadyUsed, KeyNotFound };
 
@@ -127,8 +128,8 @@ requires Hashable<H, K> class FixedFlatMap {
   };
 
   template <class T>
-  requires Hashable<H, T> static auto calculate_hash(const T& val)
-      -> std::uint32_t {
+  requires Hashable<H, T>
+  static auto calculate_hash(const T& val) -> std::uint32_t {
     H hasher;
     hasher.hash(val);
     return hasher.finish();

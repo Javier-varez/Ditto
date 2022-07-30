@@ -31,7 +31,7 @@ class ResourceLock {
   ResourceLock(const ResourceLock&) = delete;
   ResourceLock(ResourceLock&&) = delete;
   auto operator=(const ResourceLock&) -> ResourceLock& = delete;
-  auto operator=(ResourceLock &&) -> ResourceLock& = delete;
+  auto operator=(ResourceLock&&) -> ResourceLock& = delete;
 
  private:
   M m_mutex;
@@ -108,7 +108,7 @@ class ReadWriteLock {
   ReadWriteLock(const ReadWriteLock&) = delete;
   ReadWriteLock(ReadWriteLock&&) = delete;
   auto operator=(const ReadWriteLock&) -> ReadWriteLock& = delete;
-  auto operator=(ReadWriteLock &&) -> ReadWriteLock& = delete;
+  auto operator=(ReadWriteLock&&) -> ReadWriteLock& = delete;
 
  private:
   std::uint32_t m_num_readers = 0;

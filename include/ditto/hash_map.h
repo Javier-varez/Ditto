@@ -12,7 +12,8 @@
 namespace Ditto {
 
 template <class K, class V, class H = SimpleHasher>
-requires Hashable<H, K> class HashMap {
+requires Hashable<H, K>
+class HashMap {
  public:
   HashMap() = default;
   explicit HashMap(std::size_t capacity)
