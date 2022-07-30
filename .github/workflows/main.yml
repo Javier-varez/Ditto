@@ -52,7 +52,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
     - name: clang-format lint
-      uses: DoozyX/clang-format-lint-action@v0.11
+      uses: DoozyX/clang-format-lint-action@v0.14
       with:
         source: '.'
         clangFormatVersion: 14
