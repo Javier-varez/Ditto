@@ -7,9 +7,12 @@
 
 namespace Ditto {
 
-void assert_failed(const char* condition, int line, const char* file);
+[[noreturn]] void assert_failed(const char* condition, int line,
+                                const char* file);
 
-void unimplemented(const char* function, int line, const char* file);
+[[noreturn]] void unimplemented(const char* function, int line,
+                                const char* file);
+
 }  // namespace Ditto
 
 #define DITTO_VERIFY(x)                                           \

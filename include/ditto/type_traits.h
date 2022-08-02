@@ -22,11 +22,14 @@ struct is_one_of<F, S, T...> {
 template <class F, class S, class... T>
 constexpr inline bool is_one_of_v = is_one_of<F, S, T...>::value;
 
+template <class F, class... Options>
+concept one_of = is_one_of_v<F, Options...>;
+
 /*
  * @brief Type trait to check wether an invokable object returns void or not.
  */
 template <class Action, class... Args>
-using returns_void = std::is_void<::std::result_of_t<Action(Args...)>>;
+using returns_void = std::is_void<::std::invoke_result_t<Action, Args...>>;
 
 template <class Action, class... Args>
 inline constexpr bool returns_void_v = returns_void<Action, Args...>::value;

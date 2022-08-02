@@ -16,15 +16,15 @@ void print_stack_trace() {
   });
 }
 
-__attribute__((weak)) void assert_failed(const char* condition, int line,
-                                         const char* file) {
+[[gnu::weak, noreturn]] void assert_failed(const char* condition, int line,
+                                           const char* file) {
   printf("Condition failed: %s at line: %d, file: %s\n", condition, line, file);
   print_stack_trace();
   exit(EXIT_FAILURE);
 }
 
-__attribute__((weak)) void unimplemented(const char* function, int line,
-                                         const char* file) {
+[[gnu::weak, noreturn]] void unimplemented(const char* function, int line,
+                                           const char* file) {
   printf("Unimplemented function: %s at line: %d, file: %s\n", function, line,
          file);
   print_stack_trace();
