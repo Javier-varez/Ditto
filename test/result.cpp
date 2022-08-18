@@ -160,6 +160,7 @@ TEST(ResultTest, propagate_ok) {
       case InnerError::DivideByZero:
         return Result<uint32_t, OuterError>::error(OuterError::DivisionError);
       case InnerError::Other:
+      default:
         return Result<uint32_t, OuterError>::error(OuterError::Unknown);
     }
   };
