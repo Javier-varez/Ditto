@@ -13,6 +13,15 @@
 namespace Ditto {
 
 namespace detail {
+template <typename T>
+struct Instantiable {
+  using type = T;
+};
+
+template <>
+struct Instantiable<void> {
+  using type = std::uint8_t;
+};
 
 template <class T>
 struct [[nodiscard]] ErrSentinel {
@@ -33,17 +42,6 @@ concept NonVoid = !std::same_as<T, void>;
 
 template <class Ok, class Err>
 class [[nodiscard]] Result {
- private:
-  template <typename T>
-  struct Instantiable {
-    using type = T;
-  };
-
-  template <>
-  struct Instantiable<void> {
-    using type = std::uint8_t;
-  };
-
  public:
   // Constructors used for propagating errors or values
   template <class... Args, detail::NonVoid T = Ok>
@@ -162,8 +160,8 @@ class [[nodiscard]] Result {
   Result& operator=(Result&&) noexcept = default;
 
  private:
-  using InstantiableOk = typename Instantiable<Ok>::type;
-  using InstantiableErr = typename Instantiable<Err>::type;
+  using InstantiableOk = typename detail::Instantiable<Ok>::type;
+  using InstantiableErr = typename detail::Instantiable<Err>::type;
   constexpr static std::size_t ALIGNMENT =
       std::max(alignof(InstantiableOk), alignof(InstantiableErr));
   constexpr static std::size_t BUFFER_SIZE =

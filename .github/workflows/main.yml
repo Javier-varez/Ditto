@@ -8,7 +8,10 @@ on:
 
 jobs:
   tests_with_std_containers:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        compiler: ['clang++-14', 'g++']
 
     steps:
     - name: Checkout
@@ -21,13 +24,15 @@ jobs:
         cmakeAppendedArgs: '-D BUILD_DITTO_TESTS=ON -D USE_STD_TEMPLATES=ON -DDITTO_TARGET_ARCH=x86_64'
         buildDirectory: '${{ github.workspace }}/build'
       env:
-        CC: 'clang-12'
-        CXX: 'clang++-12'
+        CXX: ${{ matrix.compiler }}
     - name: Execute tests
       run: '${{ github.workspace }}/build/DittoTests'
 
   tests_without_std_containers:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        compiler: ['clang++-14', 'g++']
 
     steps:
     - name: Checkout
@@ -40,13 +45,12 @@ jobs:
         cmakeAppendedArgs: '-DBUILD_DITTO_TESTS=ON -DDITTO_TARGET_ARCH=x86_64'
         buildDirectory: '${{ github.workspace }}/build'
       env:
-        CC: 'clang-12'
-        CXX: 'clang++-12'
+        CXX: ${{ matrix.compiler }}
     - name: Execute tests
       run: '${{ github.workspace }}/build/DittoTests'
 
   clang_format:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Checkout
